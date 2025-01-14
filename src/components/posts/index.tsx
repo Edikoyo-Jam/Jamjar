@@ -1,28 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import PostCard from "./PostCard";
+// import { useEffect, useState } from "react";
+// import PostCard from "./PostCard";
 
 export default function Posts() {
-  const [posts, setPosts] = useState();
+  // const [posts, setPosts] = useState();
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await fetch("http://localhost:3005/api/v1/posts");
-      setPosts(await response.json());
-    };
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     const response = await fetch("http://localhost:3005/api/v1/posts");
+  //     setPosts(await response.json());
+  //   };
 
-    fetchPosts();
-  }, []);
+  //   fetchPosts();
+  // }, []);
 
-  return (
-    <div className="flex flex-col gap-3 p-4">
-      {posts &&
-        posts.map((post) => (
-          <div key={post.key}>
-            <PostCard post={post} />
-          </div>
-        ))}
-    </div>
-  );
+  // return (
+  //   <div className="flex flex-col gap-3 p-4">
+  //     {posts &&
+  //       posts.map((post) => (
+  //         <div key={post.key}>
+  //           <PostCard post={post} />
+  //         </div>
+  //       ))}
+  //   </div>
+  // );
+  return <div></div>;
 }
