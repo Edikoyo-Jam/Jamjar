@@ -31,6 +31,7 @@ export default async function Home() {
                 variant="bordered"
                 className="border-white/50 text-white"
                 startContent={<SiDiscord />}
+                href="https://discord.gg/rfmKzM6ASw"
               >
                 Join the Discord
               </Button>

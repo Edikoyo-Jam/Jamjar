@@ -69,7 +69,7 @@ export default function Navbar() {
             }
           >
             <Link
-              href="https://git.edikoyo.com/"
+              href="https://git.edikoyo.com/Ategon/Jamjar"
               className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-125 hover:text-red-100"
               isExternal
             >
@@ -79,7 +79,7 @@ export default function Navbar() {
         </NavbarItem>
         <NavbarItem>
           <Link
-            href="https://discord.edikoyo.com"
+            href="https://discord.gg/rfmKzM6ASw"
             className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-125 hover:text-indigo-100"
             isExternal
           >
