@@ -1,8 +1,3 @@
-import Posts from "../components/posts";
-import Timers from "../components/timers";
-import Streams from "../components/streams";
-import Announcements from "../components/announcements";
-
 import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
 import { SiDiscord } from "@icons-pack/react-simple-icons";

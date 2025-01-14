@@ -1,9 +1,6 @@
 "use client";
 
-import { Button, Card, CardBody, Chip, User } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { Heart } from "lucide-react";
-import Link from "next/link";
 import PostCard from "./PostCard";
 
 export default function Posts() {

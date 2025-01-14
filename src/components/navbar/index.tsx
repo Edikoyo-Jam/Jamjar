@@ -1,28 +1,12 @@
 import {
   Navbar as NavbarBase,
-  NavbarBrand,
   NavbarContent,
   NavbarItem,
 } from "@nextui-org/navbar";
 import { Link } from "@nextui-org/link";
-import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Image,
-  Tooltip,
-} from "@nextui-org/react";
-import {
-  SiBluesky,
-  SiDiscord,
-  SiForgejo,
-  SiLemmy,
-  SiTwitch,
-} from "@icons-pack/react-simple-icons";
-import { LogInIcon } from "lucide-react";
+import { Tooltip } from "@nextui-org/react";
+import { SiDiscord, SiForgejo } from "@icons-pack/react-simple-icons";
 
 export default function Navbar() {
   return (
