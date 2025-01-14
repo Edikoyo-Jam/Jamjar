@@ -31,14 +31,14 @@ export default function Navbar() {
       maxWidth="2xl"
       className="bg-transparent p-1"
     >
-      <NavbarBrand>
+      {/* <NavbarBrand>
         <Link
           href="/"
           className="duration-500 ease-in-out transition-all transform hover:scale-110"
         >
           <Image src="/images/aelios.png" width={160} />
         </Link>
-      </NavbarBrand>
+      </NavbarBrand> */}
       <NavbarContent>
         {/* <NavbarItem>
           <Link
