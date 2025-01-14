@@ -27,14 +27,19 @@ export default async function Home() {
             <h1 className="text-3xl sm:text-4xl md:text-5xl">Edikoyo Jam</h1>
             <p className="text-lg sm:text-xl">April 4th - 7th</p>
             <div className="flex gap-2">
-              <Button
-                variant="bordered"
-                className="border-white/50 text-white"
-                startContent={<SiDiscord />}
+              <a
                 href="https://discord.gg/rfmKzM6ASw"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                Join the Discord
-              </Button>
+                <Button
+                  variant="bordered"
+                  className="border-white/50 text-white"
+                  startContent={<SiDiscord />}
+                >
+                  Join the Discord
+                </Button>
+              </a>
             </div>
           </div>
         </div>
