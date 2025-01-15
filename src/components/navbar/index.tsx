@@ -1,11 +1,12 @@
 import {
   Navbar as NavbarBase,
+  NavbarBrand,
   NavbarContent,
   NavbarItem,
 } from "@nextui-org/navbar";
 import { Link } from "@nextui-org/link";
 import { Divider } from "@nextui-org/divider";
-import { Tooltip } from "@nextui-org/react";
+import { Image, Tooltip } from "@nextui-org/react";
 import { SiDiscord, SiForgejo, SiGithub } from "@icons-pack/react-simple-icons";
 
 export default function Navbar() {
@@ -15,31 +16,23 @@ export default function Navbar() {
       maxWidth="2xl"
       className="bg-transparent p-1"
     >
-      {/* <NavbarBrand>
+      <NavbarBrand>
         <Link
           href="/"
           className="duration-500 ease-in-out transition-all transform hover:scale-110"
         >
-          <Image src="/images/aelios.png" width={160} />
+          <Image src="/images/edikoyo.png" width={160} />
         </Link>
-      </NavbarBrand> */}
+      </NavbarBrand>
       <NavbarContent>
-        {/* <NavbarItem>
-          <Link
-            href="/about"
-            className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-110 hover:text-blue-700"
-          >
-            About
-          </Link>
-        </NavbarItem>
         <NavbarItem>
           <Link
-            href="/setup"
-            className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-110 hover:text-blue-700"
+            href="/app"
+            className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-110"
           >
-            Setup
+            Beta Site
           </Link>
-        </NavbarItem> */}
+        </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>

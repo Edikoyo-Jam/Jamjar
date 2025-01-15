@@ -42,18 +42,3 @@ export default async function Home() {
     </div>
   );
 }
-
-// export default function Home() {
-//   return (
-//     <div className="">
-//         <div>
-//             <Posts />
-//         </div>
-//         <div>
-//             <Timers />
-//             <Streams />
-//             <Announcements />
-//         </div>
-//     </div>
-//   );
-// }
