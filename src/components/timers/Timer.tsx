@@ -6,7 +6,7 @@ export default function Timer({
   name,
   targetDate,
 }: {
-  name: String;
+  name: string;
   targetDate: Date;
 }) {
   const [timeLeft, setTimeLeft] = useState(targetDate.getTime() - Date.now());
