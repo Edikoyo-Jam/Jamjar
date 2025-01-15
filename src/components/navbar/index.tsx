@@ -6,7 +6,7 @@ import {
 import { Link } from "@nextui-org/link";
 import { Divider } from "@nextui-org/divider";
 import { Tooltip } from "@nextui-org/react";
-import { SiDiscord, SiForgejo } from "@icons-pack/react-simple-icons";
+import { SiDiscord, SiForgejo, SiGithub } from "@icons-pack/react-simple-icons";
 
 export default function Navbar() {
   return (
@@ -42,6 +42,25 @@ export default function Navbar() {
         </NavbarItem> */}
       </NavbarContent>
       <NavbarContent justify="end">
+        <NavbarItem>
+          <Tooltip
+            delay={1000}
+            content={
+              <div className="px-1 py-2 text-black text-center">
+                <div className="text-small font-bold">GitHub</div>
+                <div className="text-tiny">Source Code</div>
+              </div>
+            }
+          >
+            <Link
+              href="https://github.com/Ategon/Jamjar"
+              className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-125 hover:text-red-100"
+              isExternal
+            >
+              <SiGithub title="" />
+            </Link>
+          </Tooltip>
+        </NavbarItem>
         <NavbarItem>
           <Tooltip
             delay={1000}
