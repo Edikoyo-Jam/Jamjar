@@ -9,7 +9,7 @@ export default function Posts() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch("http://localhost:3005/api/v1/posts");
+      const response = await fetch("http://jam.edikoyo.com/api/v1/posts");
       setPosts(await response.json());
     };
 
