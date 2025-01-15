@@ -12,5 +12,5 @@ npm run dev
 To run using docker and docker compose
 
 ```
-docker-compose up --build -d
+docker compose up --build -d
 ```
