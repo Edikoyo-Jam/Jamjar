@@ -2,4 +2,15 @@
 
 Frontend for a game jam site
 
-Under construction currently, I just quickly slapped together a splash page in 30 mins to show instead of the usual site progress and it will slowly get added back and polished over time
+To run using next.js (for development)
+
+```
+npm i
+npm run dev
+```
+
+To run using docker and docker compose
+
+```
+docker compose up --build -d
+```
