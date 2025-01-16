@@ -9,7 +9,11 @@ export default function Posts() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const response = await fetch("https://jam.edikoyo.com/api/v1/posts");
+      const response = await fetch(
+        process.env.MODE === "PROD"
+          ? "https://d2jam.com/api/v1/posts"
+          : "http://localhost:3005/api/v1/posts"
+      );
       setPosts(await response.json());
     };
 
