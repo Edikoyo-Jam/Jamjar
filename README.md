@@ -35,4 +35,4 @@ NEXT_PUBLIC_MODE=DEV
 Prerequisites:
 - docker
 
-If you want to start up the frontend using docker instead of what is above (either for development or for a production site) you can run `docker compose up --build -d` to build the image and then run it in the background. This will need to be done after any changes you make to rebuilt the image
+If you want to start up the frontend using docker instead of what is above (either for development or for a production site) you can run `docker compose up --build -d` to build the image and then run it in the background. This will need to be done after any changes you make to rebuild the image
