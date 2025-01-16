@@ -71,7 +71,7 @@ export default function CreatePostPage() {
 
           toast.success("Successfully created post");
 
-          redirect("/app");
+          redirect("/");
         }}
       >
         <Input
