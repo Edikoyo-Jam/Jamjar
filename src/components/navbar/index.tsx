@@ -19,7 +19,7 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import { SiDiscord, SiForgejo, SiGithub } from "@icons-pack/react-simple-icons";
-import { LogInIcon } from "lucide-react";
+import { LogInIcon, NotebookPen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { hasCookie, getCookies } from "@/helpers/cookie";
 import { usePathname } from "next/navigation";
@@ -37,7 +37,7 @@ export default function Navbar() {
       }
 
       const response = await fetch(
-        process.env.MODE === "PROD"
+        process.env.NEXT_PUBLIC_MODE === "PROD"
           ? "https://d2jam.com/api/v1/self"
           : "http://localhost:3005/api/v1/self",
         {
@@ -139,7 +139,7 @@ export default function Navbar() {
                 </Button>
               </Link>
             </NavbarItem>
-            {/* <NavbarItem>
+            <NavbarItem>
               <Link href="/signup">
                 <Button
                   endContent={<NotebookPen />}
@@ -149,7 +149,7 @@ export default function Navbar() {
                   Sign up
                 </Button>
               </Link>
-            </NavbarItem> */}
+            </NavbarItem>
           </div>
         ) : (
           <Dropdown>

@@ -10,7 +10,7 @@ export default function Posts() {
   useEffect(() => {
     const fetchPosts = async () => {
       const response = await fetch(
-        process.env.MODE === "PROD"
+        process.env.NEXT_PUBLIC_MODE === "PROD"
           ? "https://d2jam.com/api/v1/posts"
           : "http://localhost:3005/api/v1/posts"
       );

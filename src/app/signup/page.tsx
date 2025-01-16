@@ -7,6 +7,7 @@ import { useState } from "react";
 export default function UserPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
   const [error, setError] = useState("");
 
   return (
@@ -55,6 +56,17 @@ export default function UserPage() {
           onValueChange={setUsername}
         />
 
+        <Input
+          isRequired
+          errorMessage="Please enter a valid password"
+          label="Password"
+          labelPlacement="outside"
+          name="password"
+          placeholder="Enter your password"
+          type="password"
+          value={password}
+          onValueChange={setPassword}
+        />
         <Input
           isRequired
           errorMessage="Please enter a valid password"
