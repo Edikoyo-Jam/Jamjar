@@ -7,7 +7,7 @@ import Providers from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Edikoyo Jam",
+  title: "Dare2Jam",
   description: "A community built game jam!",
 };
 

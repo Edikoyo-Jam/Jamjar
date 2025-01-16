@@ -1,6 +1,7 @@
 import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
 import { SiDiscord } from "@icons-pack/react-simple-icons";
+import { Link } from "@nextui-org/react";
 
 export default async function Home() {
   return (
@@ -19,14 +20,10 @@ export default async function Home() {
       <div className="relative left-0 top-0 z-10 px-8">
         <div className="flex gap-20">
           <div className="flex flex-col gap-4 py-16 sm:py-36 md:py-72">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl">Edikoyo Jam</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl">Dare2Jam</h1>
             <p className="text-lg sm:text-xl">April 4th - 7th</p>
             <div className="flex gap-2">
-              <a
-                href="https://discord.gg/rfmKzM6ASw"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Link href="https://discord.gg/rfmKzM6ASw" target="_blank">
                 <Button
                   variant="bordered"
                   className="border-white/50 text-white"
@@ -34,7 +31,7 @@ export default async function Home() {
                 >
                   Join the Discord
                 </Button>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
