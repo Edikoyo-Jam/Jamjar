@@ -3,28 +3,67 @@
 import { Button, Form, Input } from "@nextui-org/react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function UserPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  //const [password2, setPassword2] = useState("");
-  const [error, setError] = useState("");
+  const [password2, setPassword2] = useState("");
+  const [errors, setErrors] = useState({});
 
   return (
     <div className="absolute flex items-center justify-center top-0 left-0 w-screen h-screen">
       <Form
         className="w-full max-w-xs flex flex-col gap-4"
-        validationBehavior="native"
+        validationErrors={errors}
         onReset={() => {
           setUsername("");
           setPassword("");
+          setPassword2("");
         }}
         onSubmit={async (e) => {
           e.preventDefault();
+
+          if (!password || !username || !password2) {
+            const localErrors: Record<string, string> = {};
+
+            if (password && password.length < 8) {
+              setPassword2("");
+              setErrors({ password: "Password must be minimum 8 characters" });
+              return;
+            }
+
+            if (!password) {
+              localErrors["password"] = "Please enter a valid password";
+            }
+
+            if (!password2) {
+              localErrors["password2"] = "Please reenter your password";
+            }
+
+            if (!username) {
+              localErrors["username"] = "Please enter a valid username";
+            }
+            setErrors(localErrors);
+            return;
+          }
+
+          if (password.length < 8) {
+            setPassword2("");
+            setErrors({ password: "Password must be minimum 8 characters" });
+            return;
+          }
+
+          if (password != password2) {
+            setPassword2("");
+            setErrors({ password2: "Passwords do not match" });
+            return;
+          }
+
           const response = await fetch(
             process.env.NEXT_PUBLIC_MODE === "PROD"
-              ? "https://d2jam.com/api/v1/login"
-              : "http://localhost:3005/api/v1/login",
+              ? "https://d2jam.com/api/v1/signup"
+              : "http://localhost:3005/api/v1/signup",
             {
               body: JSON.stringify({ username: username, password: password }),
               method: "POST",
@@ -32,21 +71,16 @@ export default function UserPage() {
             }
           );
 
-          if (response.status == 401) {
-            setError("Invalid username or password");
-            setPassword("");
-            return;
-          }
-
           const token = await response.json();
           document.cookie = `token=${token}`;
+
+          toast.success("Successfully signed up");
 
           redirect("/");
         }}
       >
         <Input
           isRequired
-          errorMessage="Please enter a valid username"
           label="Username"
           labelPlacement="outside"
           name="username"
@@ -58,7 +92,6 @@ export default function UserPage() {
 
         <Input
           isRequired
-          errorMessage="Please enter a valid password"
           label="Password"
           labelPlacement="outside"
           name="password"
@@ -69,14 +102,13 @@ export default function UserPage() {
         />
         <Input
           isRequired
-          errorMessage="Please enter a valid password"
-          label="Password"
+          label="Password Confirmation"
           labelPlacement="outside"
-          name="password"
-          placeholder="Enter your password"
+          name="password2"
+          placeholder="Reenter your password"
           type="password"
-          value={password}
-          onValueChange={setPassword}
+          value={password2}
+          onValueChange={setPassword2}
         />
         <div className="flex gap-2">
           <Button color="primary" type="submit">
@@ -86,9 +118,6 @@ export default function UserPage() {
             Reset
           </Button>
         </div>
-        <p>Sign up is being worked on currently</p>
-        {error && <p className="text-red-500">{error}</p>}
-        {}
       </Form>
     </div>
   );

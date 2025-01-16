@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/navbar";
 import Providers from "./providers";
+import { ToastContainer } from "react-toastify";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
             <div className="bg-zinc-100 dark:bg-zinc-950 min-h-screen">
               <Navbar />
               <div className="max-w-8xl mx-auto">{children}</div>
+              <ToastContainer />
             </div>
           </div>
         </Providers>
