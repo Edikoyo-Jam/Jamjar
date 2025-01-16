@@ -20,7 +20,7 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import { SiDiscord, SiForgejo, SiGithub } from "@icons-pack/react-simple-icons";
-import { LogInIcon, NotebookPen, SquarePen } from "lucide-react";
+import { LogInIcon, Menu, NotebookPen, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { hasCookie, getCookie } from "@/helpers/cookie";
 import { usePathname } from "next/navigation";
@@ -29,6 +29,7 @@ import { UserType } from "@/types/UserType";
 export default function Navbar() {
   const [user, setUser] = useState<UserType>();
   const pathname = usePathname();
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -55,6 +56,15 @@ export default function Navbar() {
     }
   }, [pathname]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768); // Adjust breakpoint as needed
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <NavbarBase
       shouldHideOnScroll
@@ -69,18 +79,248 @@ export default function Navbar() {
           <Image src="/images/dare2jam.png" alt="Dare2Jam logo" width={80} />
         </Link>
       </NavbarBrand>
-      <NavbarContent>
-        <NavbarItem>
-          <Link
-            href="/app"
-            className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-110"
-          >
-            Beta Site
-          </Link>
-        </NavbarItem>
-      </NavbarContent>
       <NavbarContent justify="end">
-        {user && (
+        {isMobile ? (
+          user ? (
+            <Dropdown>
+              <DropdownTrigger>
+                <Avatar src={user.profilePicture} />
+              </DropdownTrigger>
+              <DropdownMenu className="text-black">
+                <DropdownItem key="create-post" href="/create-post">
+                  Create Post
+                </DropdownItem>
+                <DropdownItem
+                  key="github"
+                  href="https://github.com/Ategon/Jamjar"
+                >
+                  GitHub
+                </DropdownItem>
+                <DropdownItem
+                  key="forgejo"
+                  href="https://git.edikoyo.com/Ategon/Jamjar"
+                >
+                  Forgejo
+                </DropdownItem>
+                <DropdownItem
+                  key="discord"
+                  href="https://discord.gg/rfmKzM6ASw"
+                >
+                  Discord
+                </DropdownItem>
+                <DropdownItem key="logout" color="danger" href="/logout">
+                  Logout
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          ) : (
+            <Dropdown>
+              <DropdownTrigger>
+                <Menu />
+              </DropdownTrigger>
+              <DropdownMenu className="text-black">
+                <DropdownItem
+                  key="github"
+                  href="https://github.com/Ategon/Jamjar"
+                >
+                  GitHub
+                </DropdownItem>
+                <DropdownItem
+                  key="forgejo"
+                  href="https://git.edikoyo.com/Ategon/Jamjar"
+                >
+                  Forgejo
+                </DropdownItem>
+                <DropdownItem
+                  key="discord"
+                  href="https://discord.gg/rfmKzM6ASw"
+                >
+                  Discord
+                </DropdownItem>
+                <DropdownItem key="login" href="/login">
+                  Log In
+                </DropdownItem>
+                <DropdownItem key="signup" href="/signup">
+                  Sign Up
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )
+        ) : (
+          <div className="flex gap-3 items-center">
+            {user && (
+              <NavbarItem>
+                <Link href="/create-post">
+                  <Button
+                    endContent={<SquarePen />}
+                    className="text-white border-white/50 hover:border-green-100/50 hover:text-green-100 hover:scale-110 transition-all transform duration-500 ease-in-out"
+                    variant="bordered"
+                  >
+                    Create Post
+                  </Button>
+                </Link>
+                <Spacer x={32} />
+              </NavbarItem>
+            )}
+            <NavbarItem>
+              <Tooltip
+                delay={1000}
+                content={
+                  <div className="px-1 py-2 text-black text-center">
+                    <div className="text-small font-bold">GitHub</div>
+                    <div className="text-tiny">Source Code</div>
+                  </div>
+                }
+              >
+                <Link
+                  href="https://github.com/Ategon/Jamjar"
+                  className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-125 hover:text-red-100"
+                  isExternal
+                >
+                  <SiGithub title="" />
+                </Link>
+              </Tooltip>
+            </NavbarItem>
+            <NavbarItem>
+              <Tooltip
+                delay={1000}
+                content={
+                  <div className="px-1 py-2 text-black text-center">
+                    <div className="text-small font-bold">Forgejo</div>
+                    <div className="text-tiny">Source Code</div>
+                  </div>
+                }
+              >
+                <Link
+                  href="https://git.edikoyo.com/Ategon/Jamjar"
+                  className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-125 hover:text-red-100"
+                  isExternal
+                >
+                  <SiForgejo title="" />
+                </Link>
+              </Tooltip>
+            </NavbarItem>
+            <NavbarItem>
+              <Link
+                href="https://discord.gg/rfmKzM6ASw"
+                className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-125 hover:text-indigo-100"
+                isExternal
+              >
+                <SiDiscord />
+              </Link>
+            </NavbarItem>
+            <Divider orientation="vertical" className="h-1/2" />
+            {!user ? (
+              <div className="flex gap-3 items-center">
+                <NavbarItem>
+                  <Link href="/login">
+                    <Button
+                      endContent={<LogInIcon />}
+                      className="text-white border-white/50 hover:border-green-100/50 hover:text-green-100 hover:scale-110 transition-all transform duration-500 ease-in-out"
+                      variant="bordered"
+                    >
+                      Log In
+                    </Button>
+                  </Link>
+                </NavbarItem>
+                <NavbarItem>
+                  <Link href="/signup">
+                    <Button
+                      endContent={<NotebookPen />}
+                      className="text-white border-white/50 hover:border-green-100/50 hover:text-green-100 hover:scale-110 transition-all transform duration-500 ease-in-out"
+                      variant="bordered"
+                    >
+                      Sign up
+                    </Button>
+                  </Link>
+                </NavbarItem>
+              </div>
+            ) : (
+              <Dropdown>
+                <DropdownTrigger>
+                  <Avatar src={user.profilePicture} />
+                </DropdownTrigger>
+                <DropdownMenu>
+                  {/* <DropdownItem
+                key="profile"
+                className="text-black"
+                href="/profile"
+              >
+                Profile
+              </DropdownItem>
+              <DropdownItem
+                showDivider
+                key="settings"
+                className="text-black"
+                href="/settings"
+              >
+                Settings
+              </DropdownItem> */}
+                  <DropdownItem
+                    key="logout"
+                    color="danger"
+                    className="text-danger"
+                    href="/logout"
+                  >
+                    Logout
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            )}
+          </div>
+        )}
+      </NavbarContent>
+    </NavbarBase>
+  );
+}
+/* 
+
+{isMobile ? (
+          // Mobile view
+          user ? (
+            <Dropdown>
+              <DropdownTrigger>
+                <Avatar src={user.profilePicture} />
+              </DropdownTrigger>
+              <DropdownMenu>
+                <DropdownItem key="create-post" href="/create-post">
+                  Create Post
+                </DropdownItem>
+                <DropdownItem key="logout" color="danger" href="/logout">
+                  Logout
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          ) : (
+            <Dropdown>
+              <DropdownTrigger>
+                <Button auto flat className="text-white">
+                  ☰
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu>
+                <DropdownItem key="github" href="https://github.com/Ategon/Jamjar" isExternal>
+                  GitHub
+                </DropdownItem>
+                <DropdownItem key="forgejo" href="https://git.edikoyo.com/Ategon/Jamjar" isExternal>
+                  Forgejo
+                </DropdownItem>
+                <DropdownItem key="discord" href="https://discord.gg/rfmKzM6ASw" isExternal>
+                  Discord
+                </DropdownItem>
+                <DropdownItem key="login" href="/login">
+                  Log In
+                </DropdownItem>
+                <DropdownItem key="signup" href="/signup">
+                  Sign Up
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )
+        ) : (
+
+
+        user && (
           <NavbarItem>
             <Link href="/create-post">
               <Button
@@ -93,7 +333,7 @@ export default function Navbar() {
             </Link>
             <Spacer x={32} />
           </NavbarItem>
-        )}
+        )
         <NavbarItem>
           <Tooltip
             delay={1000}
@@ -173,21 +413,7 @@ export default function Navbar() {
               <Avatar src={user.profilePicture} />
             </DropdownTrigger>
             <DropdownMenu>
-              {/* <DropdownItem
-                key="profile"
-                className="text-black"
-                href="/profile"
-              >
-                Profile
-              </DropdownItem>
-              <DropdownItem
-                showDivider
-                key="settings"
-                className="text-black"
-                href="/settings"
-              >
-                Settings
-              </DropdownItem> */}
+              
               <DropdownItem
                 key="logout"
                 color="danger"
@@ -199,7 +425,5 @@ export default function Navbar() {
             </DropdownMenu>
           </Dropdown>
         )}
-      </NavbarContent>
-    </NavbarBase>
-  );
-}
+      )
+      </NavbarContent> */
