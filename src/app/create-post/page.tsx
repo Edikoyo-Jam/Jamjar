@@ -1,6 +1,6 @@
 "use client";
 
-import { getCookies, hasCookie } from "@/helpers/cookie";
+import { getCookie, hasCookie } from "@/helpers/cookie";
 import { Button, Form, Input, Textarea } from "@nextui-org/react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
@@ -41,7 +41,7 @@ export default function CreatePostPage() {
             return;
           }
 
-          if (!hasCookie()) {
+          if (!hasCookie("token")) {
             setErrors({ content: "You are not logged in" });
             return;
           }
@@ -54,12 +54,12 @@ export default function CreatePostPage() {
               body: JSON.stringify({
                 title: title,
                 content: content,
-                username: getCookies().user,
+                username: getCookie("user"),
               }),
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                authorization: `Bearer ${getCookies().token}`,
+                authorization: `Bearer ${getCookie("token")}`,
               },
             }
           );

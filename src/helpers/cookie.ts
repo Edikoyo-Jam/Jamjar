@@ -8,11 +8,22 @@ export function getCookies() {
   return cookies;
 }
 
-export function hasCookie() {
+export function getCookie(cookie: string) {
   const pairs = document.cookie.split(";");
   for (let i = 0; i < pairs.length; i++) {
-    const pair = pairs[i].split("=");
-    if (pair[0] == "token") {
+    const pair = pairs[i].trim().split("=");
+    if (pair[0] == cookie) {
+      return pair[1];
+    }
+  }
+  return null;
+}
+
+export function hasCookie(cookie: string) {
+  const pairs = document.cookie.split(";");
+  for (let i = 0; i < pairs.length; i++) {
+    const pair = pairs[i].trim().split("=");
+    if (pair[0] == cookie) {
       return true;
     }
   }

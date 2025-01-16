@@ -22,7 +22,7 @@ import {
 import { SiDiscord, SiForgejo, SiGithub } from "@icons-pack/react-simple-icons";
 import { LogInIcon, NotebookPen, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
-import { hasCookie, getCookies } from "@/helpers/cookie";
+import { hasCookie, getCookie } from "@/helpers/cookie";
 import { usePathname } from "next/navigation";
 import { UserType } from "@/types/UserType";
 
@@ -33,17 +33,17 @@ export default function Navbar() {
   useEffect(() => {
     loadUser();
     async function loadUser() {
-      if (!hasCookie()) {
+      if (!hasCookie("token")) {
         setUser(undefined);
         return;
       }
 
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self?username=${getCookies().user}`
-          : `http://localhost:3005/api/v1/self?username=${getCookies().user}`,
+          ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
+          : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
         {
-          headers: { authorization: `Bearer ${getCookies().token}` },
+          headers: { authorization: `Bearer ${getCookie("token")}` },
         }
       );
 
