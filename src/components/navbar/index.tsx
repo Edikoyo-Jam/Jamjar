@@ -16,39 +16,41 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Image,
+  Spacer,
   Tooltip,
 } from "@nextui-org/react";
 import { SiDiscord, SiForgejo, SiGithub } from "@icons-pack/react-simple-icons";
-import { LogInIcon, NotebookPen } from "lucide-react";
+import { LogInIcon, NotebookPen, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { hasCookie, getCookies } from "@/helpers/cookie";
 import { usePathname } from "next/navigation";
+import { UserType } from "@/types/UserType";
 
 export default function Navbar() {
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState<UserType>();
   const pathname = usePathname();
 
   useEffect(() => {
     loadUser();
     async function loadUser() {
       if (!hasCookie()) {
-        setUser("");
+        setUser(undefined);
         return;
       }
 
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/self"
-          : "http://localhost:3005/api/v1/self",
+          ? `https://d2jam.com/api/v1/self?username=${getCookies().user}`
+          : `http://localhost:3005/api/v1/self?username=${getCookies().user}`,
         {
           headers: { authorization: `Bearer ${getCookies().token}` },
         }
       );
 
-      if ((await response.text()) == "ok") {
-        setUser("ok");
+      if (response.status == 200) {
+        setUser(await response.json());
       } else {
-        setUser("");
+        setUser(undefined);
       }
     }
   }, [pathname]);
@@ -78,6 +80,20 @@ export default function Navbar() {
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
+        {user && (
+          <NavbarItem>
+            <Link href="/create-post">
+              <Button
+                endContent={<SquarePen />}
+                className="text-white border-white/50 hover:border-green-100/50 hover:text-green-100 hover:scale-110 transition-all transform duration-500 ease-in-out"
+                variant="bordered"
+              >
+                Create Post
+              </Button>
+            </Link>
+            <Spacer x={32} />
+          </NavbarItem>
+        )}
         <NavbarItem>
           <Tooltip
             delay={1000}
@@ -154,7 +170,7 @@ export default function Navbar() {
         ) : (
           <Dropdown>
             <DropdownTrigger>
-              <Avatar />
+              <Avatar src={user.profilePicture} />
             </DropdownTrigger>
             <DropdownMenu>
               {/* <DropdownItem

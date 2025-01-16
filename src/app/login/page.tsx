@@ -57,8 +57,10 @@ export default function UserPage() {
             return;
           }
 
-          const token = await response.json();
+          const { token, user } = await response.json();
+
           document.cookie = `token=${token}`;
+          document.cookie = `user=${user.slug}`;
 
           toast.success("Successfully logged in");
 

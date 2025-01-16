@@ -48,6 +48,12 @@ export default function UserPage() {
             return;
           }
 
+          if (username.length > 32) {
+            setPassword2("");
+            setErrors({ password: "Usernames can be maximum 32 characters" });
+            return;
+          }
+
           if (password.length < 8) {
             setPassword2("");
             setErrors({ password: "Password must be minimum 8 characters" });
@@ -71,8 +77,15 @@ export default function UserPage() {
             }
           );
 
-          const token = await response.json();
+          if (response.status == 409) {
+            setErrors({ username: "User already exists" });
+            setPassword2("");
+            return;
+          }
+
+          const { token, user } = await response.json();
           document.cookie = `token=${token}`;
+          document.cookie = `user=${user.slug}`;
 
           toast.success("Successfully signed up");
 
