@@ -139,7 +139,7 @@ export default function Navbar() {
                 </Button>
               </Link>
             </NavbarItem>
-            <NavbarItem>
+            {/* <NavbarItem>
               <Link href="/signup">
                 <Button
                   endContent={<NotebookPen />}
@@ -149,7 +149,7 @@ export default function Navbar() {
                   Sign up
                 </Button>
               </Link>
-            </NavbarItem>
+            </NavbarItem> */}
           </div>
         ) : (
           <Dropdown>

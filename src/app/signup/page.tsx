@@ -7,7 +7,7 @@ import { useState } from "react";
 export default function UserPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [password2, setPassword2] = useState("");
+  //const [password2, setPassword2] = useState("");
   const [error, setError] = useState("");
 
   return (
