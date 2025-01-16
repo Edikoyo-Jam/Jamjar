@@ -7,8 +7,15 @@ Frontend for a game jam site
 - Typescript (language)
 - Next.js (web framework)
 - Tailwind (css framework)
+- Lucide (icons)
+- Eslint (static code analysis)
+- Framer motion (animations)
+- React Toastify (toasts)
 
 ## Running for development
+
+Prerequisites:
+- node.js or equivalent
 
 To start up the site locally for development you need to:
 
@@ -24,5 +31,8 @@ NEXT_PUBLIC_MODE=DEV
 7. Go to https://localhost:3000 (or another port if it says it started up the site on a different port)
 
 ## Running using docker
+
+Prerequisites:
+- docker
 
 If you want to start up the frontend using docker instead of what is above (either for development or for a production site) you can run `docker compose up --build -d` to build the image and then run it in the background
