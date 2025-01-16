@@ -16,24 +16,38 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Image,
-  Spacer,
   Tooltip,
 } from "@nextui-org/react";
 import { SiDiscord, SiForgejo, SiGithub } from "@icons-pack/react-simple-icons";
-import { LogInIcon, Menu, NotebookPen, SquarePen } from "lucide-react";
+import {
+  CalendarPlus,
+  Gamepad2,
+  LogInIcon,
+  Menu,
+  NotebookPen,
+  SquarePen,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { hasCookie, getCookie } from "@/helpers/cookie";
 import { usePathname } from "next/navigation";
 import { UserType } from "@/types/UserType";
+import { getCurrentJam, joinJam } from "@/helpers/jam";
+import { toast } from "react-toastify";
+import { JamType } from "@/types/JamType";
 
 export default function Navbar() {
   const [user, setUser] = useState<UserType>();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
+  const [jam, setJam] = useState<JamType | null>();
+  const [isInJam, setIsInJam] = useState<boolean>();
 
   useEffect(() => {
     loadUser();
     async function loadUser() {
+      const currentJam = await getCurrentJam();
+      setJam(currentJam);
+
       if (!hasCookie("token")) {
         setUser(undefined);
         return;
@@ -48,8 +62,19 @@ export default function Navbar() {
         }
       );
 
+      const user = await response.json();
+
+      if (
+        currentJam &&
+        user.jams.filter((jam: JamType) => jam.id == currentJam.id).length > 0
+      ) {
+        setIsInJam(true);
+      } else {
+        setIsInJam(false);
+      }
+
       if (response.status == 200) {
-        setUser(await response.json());
+        setUser(user);
       } else {
         setUser(undefined);
       }
@@ -87,8 +112,51 @@ export default function Navbar() {
                 <Avatar src={user.profilePicture} />
               </DropdownTrigger>
               <DropdownMenu className="text-black">
+                {jam && isInJam ? (
+                  <DropdownItem key="create-game" href="/create-game">
+                    Create Game
+                  </DropdownItem>
+                ) : null}
+                {jam && !isInJam ? (
+                  <DropdownItem
+                    key="join-event"
+                    onPress={async () => {
+                      try {
+                        const currentJam = await getCurrentJam();
+
+                        if (!currentJam) {
+                          toast.error("There is no jam to join");
+                          return;
+                        }
+
+                        if (await joinJam(currentJam.id)) {
+                          setIsInJam(true);
+                        }
+                      } catch (error) {
+                        console.error("Error during join process:", error);
+                      }
+                    }}
+                  >
+                    Join Event
+                  </DropdownItem>
+                ) : null}
                 <DropdownItem key="create-post" href="/create-post">
                   Create Post
+                </DropdownItem>
+                <DropdownItem
+                  key="profile"
+                  className="text-black"
+                  href={`/u/${user.slug}`}
+                >
+                  Profile
+                </DropdownItem>
+                <DropdownItem
+                  showDivider
+                  key="settings"
+                  className="text-black"
+                  href="/settings"
+                >
+                  Settings
                 </DropdownItem>
                 <DropdownItem
                   key="github"
@@ -148,8 +216,43 @@ export default function Navbar() {
           )
         ) : (
           <div className="flex gap-3 items-center">
-            {user && (
+            {user && jam && isInJam && (
               <NavbarItem>
+                <Link href="/create-game">
+                  <Button
+                    endContent={<Gamepad2 />}
+                    className="text-white border-white/50 hover:border-green-100/50 hover:text-green-100 hover:scale-110 transition-all transform duration-500 ease-in-out"
+                    variant="bordered"
+                  >
+                    Create Game
+                  </Button>
+                </Link>
+              </NavbarItem>
+            )}
+            {user && jam && !isInJam && (
+              <NavbarItem>
+                <Button
+                  endContent={<CalendarPlus />}
+                  className="text-white border-white/50 hover:border-green-100/50 hover:text-green-100 hover:scale-110 transition-all transform duration-500 ease-in-out"
+                  variant="bordered"
+                  onPress={async () => {
+                    const currentJam = await getCurrentJam();
+
+                    if (!currentJam) {
+                      toast.error("There is no jam to join");
+                      return;
+                    }
+                    if (await joinJam(currentJam.id)) {
+                      setIsInJam(true);
+                    }
+                  }}
+                >
+                  Join Jam
+                </Button>
+              </NavbarItem>
+            )}
+            {user && (
+              <NavbarItem className="flex items-center">
                 <Link href="/create-post">
                   <Button
                     endContent={<SquarePen />}
@@ -159,7 +262,6 @@ export default function Navbar() {
                     Create Post
                   </Button>
                 </Link>
-                <Spacer x={32} />
               </NavbarItem>
             )}
             <NavbarItem>
@@ -241,21 +343,21 @@ export default function Navbar() {
                   <Avatar src={user.profilePicture} />
                 </DropdownTrigger>
                 <DropdownMenu>
-                  {/* <DropdownItem
-                key="profile"
-                className="text-black"
-                href="/profile"
-              >
-                Profile
-              </DropdownItem>
-              <DropdownItem
-                showDivider
-                key="settings"
-                className="text-black"
-                href="/settings"
-              >
-                Settings
-              </DropdownItem> */}
+                  <DropdownItem
+                    key="profile"
+                    className="text-black"
+                    href={`/u/${user.slug}`}
+                  >
+                    Profile
+                  </DropdownItem>
+                  <DropdownItem
+                    showDivider
+                    key="settings"
+                    className="text-black"
+                    href="/settings"
+                  >
+                    Settings
+                  </DropdownItem>
                   <DropdownItem
                     key="logout"
                     color="danger"
