@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Navbar as NavbarBase,
   NavbarBrand,
@@ -6,10 +8,51 @@ import {
 } from "@nextui-org/navbar";
 import { Link } from "@nextui-org/link";
 import { Divider } from "@nextui-org/divider";
-import { Image, Tooltip } from "@nextui-org/react";
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Image,
+  Tooltip,
+} from "@nextui-org/react";
 import { SiDiscord, SiForgejo, SiGithub } from "@icons-pack/react-simple-icons";
+import { LogInIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { hasCookie, getCookies } from "@/helpers/cookie";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
+  const [user, setUser] = useState("");
+  const pathname = usePathname();
+
+  useEffect(() => {
+    loadUser();
+    async function loadUser() {
+      if (!hasCookie()) {
+        setUser("");
+        return;
+      }
+
+      const response = await fetch(
+        process.env.MODE === "PROD"
+          ? "https://d2jam.com/api/v1/self"
+          : "http://localhost:3005/api/v1/self",
+        {
+          headers: { authorization: `Bearer ${getCookies().token}` },
+        }
+      );
+
+      if ((await response.text()) == "ok") {
+        setUser("ok");
+      } else {
+        setUser("");
+      }
+    }
+  }, [pathname]);
+
   return (
     <NavbarBase
       shouldHideOnScroll
@@ -83,15 +126,63 @@ export default function Navbar() {
           </Link>
         </NavbarItem>
         <Divider orientation="vertical" className="h-1/2" />
-        {/* <NavbarItem>
-          <Button
-            endContent={<LogInIcon />}
-            className="text-white border-white/50 hover:border-green-100/50 hover:text-green-100 hover:scale-110 transition-all transform duration-500 ease-in-out"
-            variant="bordered"
-          >
-            Log In
-          </Button>
-        </NavbarItem> */}
+        {!user ? (
+          <div className="flex gap-3 items-center">
+            <NavbarItem>
+              <Link href="/login">
+                <Button
+                  endContent={<LogInIcon />}
+                  className="text-white border-white/50 hover:border-green-100/50 hover:text-green-100 hover:scale-110 transition-all transform duration-500 ease-in-out"
+                  variant="bordered"
+                >
+                  Log In
+                </Button>
+              </Link>
+            </NavbarItem>
+            {/* <NavbarItem>
+              <Link href="/signup">
+                <Button
+                  endContent={<NotebookPen />}
+                  className="text-white border-white/50 hover:border-green-100/50 hover:text-green-100 hover:scale-110 transition-all transform duration-500 ease-in-out"
+                  variant="bordered"
+                >
+                  Sign up
+                </Button>
+              </Link>
+            </NavbarItem> */}
+          </div>
+        ) : (
+          <Dropdown>
+            <DropdownTrigger>
+              <Avatar />
+            </DropdownTrigger>
+            <DropdownMenu>
+              {/* <DropdownItem
+                key="profile"
+                className="text-black"
+                href="/profile"
+              >
+                Profile
+              </DropdownItem>
+              <DropdownItem
+                showDivider
+                key="settings"
+                className="text-black"
+                href="/settings"
+              >
+                Settings
+              </DropdownItem> */}
+              <DropdownItem
+                key="logout"
+                color="danger"
+                className="text-danger"
+                href="/logout"
+              >
+                Logout
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        )}
       </NavbarContent>
     </NavbarBase>
   );
