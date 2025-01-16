@@ -19,7 +19,7 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import { SiDiscord, SiForgejo, SiGithub } from "@icons-pack/react-simple-icons";
-import { LogInIcon, NotebookPen } from "lucide-react";
+import { LogInIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { hasCookie, getCookies } from "@/helpers/cookie";
 import { usePathname } from "next/navigation";
