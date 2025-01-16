@@ -275,7 +275,7 @@ export default function Navbar() {
                 }
               >
                 <Link
-                  href="https://github.com/Ategon/Jamjar"
+                  href="https://github.com/Dare2Jam/"
                   className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-125 hover:text-red-100"
                   isExternal
                 >
@@ -447,7 +447,7 @@ export default function Navbar() {
             }
           >
             <Link
-              href="https://github.com/Ategon/Jamjar"
+              href="https://github.com/Dare2Jam/"
               className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-125 hover:text-red-100"
               isExternal
             >
