@@ -1,12 +1,13 @@
-import { Avatar, Card, CardBody, Spacer } from "@nextui-org/react";
+import { Avatar, Button, Card, CardBody, Spacer } from "@nextui-org/react";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
 import { PostType } from "@/types/PostType";
+import { Heart, MessageCircle } from "lucide-react";
 
 export default function PostCard({ post }: { post: PostType }) {
   return (
     <Card className="bg-opacity-60">
-      <CardBody>
+      <CardBody className="p-5">
         <p className="text-2xl">{post.title}</p>
 
         <div className="flex items-center gap-3 text-xs text-default-500 pt-1">
@@ -35,14 +36,14 @@ export default function PostCard({ post }: { post: PostType }) {
 
         <Spacer y={4} />
 
-        {/* <div className="flex gap-3">
-          <Button size="sm">
+        <div className="flex gap-3">
+          <Button size="sm" variant="bordered">
             <Heart size={16} /> {post.likers.length}
           </Button>
-          <Button size="sm">
+          <Button size="sm" variant="bordered">
             <MessageCircle size={16} /> {0}
           </Button>
-        </div> */}
+        </div>
       </CardBody>
     </Card>
   );

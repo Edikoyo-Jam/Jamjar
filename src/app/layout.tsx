@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "../components/navbar";
 import Providers from "./providers";
 import { ToastContainer } from "react-toastify";
+import { Spacer } from "@nextui-org/react";
+import Footer from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,9 +24,13 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <div className="dark">
-            <div className="bg-zinc-100 dark:bg-zinc-950 min-h-screen">
+            <div className="bg-gradient-to-br from-[#181818] to-[#222] min-h-screen flex flex-col">
               <Navbar />
-              <div className="max-w-8xl mx-auto">{children}</div>
+              <Spacer y={5} />
+              <div className="max-w-8xl mx-auto flex-grow w-full">
+                {children}
+              </div>
+              <Footer />
               <ToastContainer />
             </div>
           </div>

@@ -28,6 +28,7 @@ export default function UserPage() {
           : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
         {
           headers: { authorization: `Bearer ${getCookie("token")}` },
+          credentials: "include",
         }
       );
 

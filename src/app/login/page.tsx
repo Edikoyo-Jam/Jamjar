@@ -48,6 +48,7 @@ export default function UserPage() {
               body: JSON.stringify({ username: username, password: password }),
               method: "POST",
               headers: { "Content-Type": "application/json" },
+              credentials: "include",
             }
           );
 
@@ -57,7 +58,15 @@ export default function UserPage() {
             return;
           }
 
-          const { token, user } = await response.json();
+          const { user } = await response.json();
+          const token = response.headers.get("Authorization");
+          console.log(response.headers);
+
+          if (!token) {
+            toast.error("Failed to retreive access token");
+            setPassword("");
+            return;
+          }
 
           document.cookie = `token=${token}`;
           document.cookie = `user=${user.slug}`;
