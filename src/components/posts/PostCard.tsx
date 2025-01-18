@@ -3,6 +3,7 @@ import { formatDistance } from "date-fns";
 import Link from "next/link";
 import { PostType } from "@/types/PostType";
 import { Heart, MessageCircle } from "lucide-react";
+import LikeButton from "./LikeButton";
 
 export default function PostCard({ post }: { post: PostType }) {
   return (
@@ -37,9 +38,7 @@ export default function PostCard({ post }: { post: PostType }) {
         <Spacer y={4} />
 
         <div className="flex gap-3">
-          <Button size="sm" variant="bordered">
-            <Heart size={16} /> {post.likers.length}
-          </Button>
+          <LikeButton post={post} />
           <Button size="sm" variant="bordered">
             <MessageCircle size={16} /> {0}
           </Button>

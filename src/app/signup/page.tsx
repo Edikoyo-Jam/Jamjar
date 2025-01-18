@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Form, Input } from "@nextui-org/react";
+import { Button, Form, Input, Link } from "@nextui-org/react";
 import { useState } from "react";
 
 export default function UserPage() {
@@ -129,6 +129,9 @@ export default function UserPage() {
             Reset
           </Button>
         </div>
+        <p>
+          Already have an account? <Link href="/login">Log In</Link>
+        </p>
       </Form>
     </div>
   );

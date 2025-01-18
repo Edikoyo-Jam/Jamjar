@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Form, Input } from "@nextui-org/react";
+import { Button, Form, Input, Link } from "@nextui-org/react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -105,6 +105,9 @@ export default function UserPage() {
             Reset
           </Button>
         </div>
+        <p>
+          Don't have an account? <Link href="/signup">Sign up</Link>
+        </p>
       </Form>
     </div>
   );
