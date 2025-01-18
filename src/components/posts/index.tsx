@@ -11,10 +11,12 @@ import {
   DropdownTrigger,
 } from "@nextui-org/react";
 import { PostSort } from "@/types/PostSort";
+import { PostStyle } from "@/types/PostStyle";
 
 export default function Posts() {
   const [posts, setPosts] = useState<PostType[]>();
   const [sort, setSort] = useState<PostSort>("newest");
+  const [style, setStyle] = useState<PostStyle>("cozy");
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -55,16 +57,31 @@ export default function Posts() {
           </Button>
         </div>
         <div>
-          <Button size="sm" className="text-xs" variant="faded">
-            Cozy
-          </Button>
+          <Dropdown>
+            <DropdownTrigger>
+              <Button size="sm" className="text-xs" variant="faded">
+                {style.charAt(0).toUpperCase() + style.slice(1)}
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu
+              onAction={(key) => {
+                setStyle(key as PostStyle);
+              }}
+              className="text-black"
+            >
+              <DropdownItem key="cozy">Cozy</DropdownItem>
+              <DropdownItem key="compact">Compact</DropdownItem>
+              <DropdownItem key="ultra">Ultra Compact</DropdownItem>
+              <DropdownItem key="adaptive">Adaptive</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </div>
       </div>
       <div className="flex flex-col gap-3 p-4">
         {posts &&
           posts.map((post) => (
             <div key={post.id}>
-              <PostCard post={post} />
+              <PostCard post={post} style={style} />
             </div>
           ))}
       </div>
