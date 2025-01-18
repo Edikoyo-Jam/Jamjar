@@ -8,5 +8,5 @@ export interface PostType {
     name: string;
   };
   createdAt: Date;
-  likers: [];
+  likes: [];
 }
