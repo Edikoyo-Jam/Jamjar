@@ -106,7 +106,7 @@ export default function UserPage() {
           </Button>
         </div>
         <p>
-          Don't have an account? <Link href="/signup">Sign up</Link>
+          Don&apos;t have an account? <Link href="/signup">Sign up</Link>
         </p>
       </Form>
     </div>

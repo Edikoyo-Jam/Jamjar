@@ -2,7 +2,7 @@ import { Avatar, Button, Card, CardBody, Spacer } from "@nextui-org/react";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
 import { PostType } from "@/types/PostType";
-import { Heart, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import LikeButton from "./LikeButton";
 
 export default function PostCard({ post }: { post: PostType }) {
