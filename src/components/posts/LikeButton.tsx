@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 import { useState } from "react";
 
 export default function LikeButton({ post }: { post: PostType }) {
-  const [likes, setLikes] = useState(post.likes.length);
+  const [likes, setLikes] = useState<number>(post.likes.length);
 
   return (
     <Button
@@ -42,7 +42,7 @@ export default function LikeButton({ post }: { post: PostType }) {
             return;
           }
         } else {
-          setLikes(await response.text());
+          setLikes(parseInt(await response.text()));
         }
       }}
     >
