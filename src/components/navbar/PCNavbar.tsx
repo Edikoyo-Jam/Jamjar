@@ -12,10 +12,12 @@ import NavbarLink from "./NavbarLink";
 import NavbarSearchbar from "./NavbarSearchbar";
 import NavbarButtonLink from "./NavbarButtonLink";
 import {
+  Bell,
   CalendarPlus,
   Gamepad2,
   LogInIcon,
   NotebookPen,
+  Shield,
   SquarePen,
 } from "lucide-react";
 import NextImage from "next/image";
@@ -28,6 +30,8 @@ import { UserType } from "@/types/UserType";
 import NavbarUser from "./PCNavbarUser";
 import NavbarButtonAction from "./NavbarButtonAction";
 import { toast } from "react-toastify";
+import NavbarIconLink from "./NavbarIconLink";
+import ThemeToggle from "../theme-toggle";
 
 export default function PCNavbar() {
   const pathname = usePathname();
@@ -76,7 +80,12 @@ export default function PCNavbar() {
   }, [pathname]);
 
   return (
-    <NavbarBase maxWidth="2xl" className="bg-[#222] p-1" isBordered height={80}>
+    <NavbarBase
+      maxWidth="2xl"
+      className="bg-[#fff] dark:bg-[#222] p-1 duration-500 ease-in-out transition-color"
+      isBordered
+      height={80}
+    >
       {/* Left side navbar items */}
       <NavbarContent justify="start" className="gap-10">
         <NavbarBrand className="flex-grow-0">
@@ -134,6 +143,11 @@ export default function PCNavbar() {
             href="/create-post"
           />
         )}
+        {user && <NavbarIconLink icon={<Bell />} href="/inbox" />}
+        {user && user.mod && (
+          <NavbarIconLink icon={<Shield />} href="/reports" />
+        )}
+        <ThemeToggle />
         <Divider orientation="vertical" className="h-1/2" />
         {!user && (
           <NavbarButtonLink icon={<LogInIcon />} name="Log In" href="/login" />

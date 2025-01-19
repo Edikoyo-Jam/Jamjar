@@ -1,12 +1,11 @@
+import { UserType } from "./UserType";
+
 export interface PostType {
   id: number;
   title: string;
   content: string;
-  author: {
-    slug: string;
-    profilePicture: string;
-    name: string;
-  };
+  author: UserType;
   createdAt: Date;
   likes: [];
+  hasLiked: boolean;
 }

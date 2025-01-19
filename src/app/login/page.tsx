@@ -105,7 +105,7 @@ export default function UserPage() {
             Reset
           </Button>
         </div>
-        <p>
+        <p className="text-[#333] dark:text-white transition-color duration-500 ease-in-out">
           Don&apos;t have an account? <Link href="/signup">Sign up</Link>
         </p>
       </Form>

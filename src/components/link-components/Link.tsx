@@ -9,7 +9,7 @@ export default function Link({ name, href }: LinkProps) {
   return (
     <BaseLink
       href={href}
-      className="text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-110"
+      className="text-[#333] dark:text-white flex justify-center duration-500 ease-in-out transition-all transform hover:scale-110 duration-500 ease-in-out transition-color"
     >
       {name}
     </BaseLink>

@@ -4,4 +4,6 @@ export interface UserType {
   name: string;
   profilePicture: string;
   createdAt: Date;
+  mod: boolean;
+  admin: boolean;
 }

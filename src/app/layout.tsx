@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/navbar";
-import Providers from "./providers";
 import { ToastContainer } from "react-toastify";
-import { Spacer } from "@nextui-org/react";
+import { NextUIProvider, Spacer } from "@nextui-org/react";
 import Footer from "@/components/footer";
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,21 +20,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
-          <div className="dark">
-            <div className="bg-gradient-to-br from-[#181818] to-[#222] min-h-screen flex flex-col">
-              <Navbar />
-              <Spacer y={5} />
-              <div className="max-w-8xl mx-auto flex-grow w-full">
-                {children}
+        <NextUIProvider>
+          <ThemeProvider attribute="class">
+            <div className="">
+              <div className="bg-[#fff] dark:bg-[#181818] min-h-screen flex flex-col ease-in-out transition-color duration-500">
+                <Navbar />
+                <Spacer y={5} />
+                <div className="max-w-6xl xl:max-w-7xl 2xl:max-w-8xl mx-auto flex-grow w-full">
+                  {children}
+                </div>
+                <Footer />
+                <ToastContainer />
               </div>
-              <Footer />
-              <ToastContainer />
             </div>
-          </div>
-        </Providers>
+          </ThemeProvider>
+        </NextUIProvider>
       </body>
     </html>
   );

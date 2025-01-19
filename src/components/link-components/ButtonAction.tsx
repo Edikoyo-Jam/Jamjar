@@ -15,7 +15,7 @@ export default function ButtonAction({
   return (
     <Button
       endContent={icon}
-      className="text-white border-white/50 hover:scale-110 transition-all transform duration-500 ease-in-out"
+      className="text-[#333] dark:text-white border-[#333]/50 dark:border-white/50 hover:scale-110 transition-all transform duration-500 ease-in-out"
       variant="bordered"
       onPress={onPress}
     >

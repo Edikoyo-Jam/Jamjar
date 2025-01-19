@@ -129,7 +129,7 @@ export default function UserPage() {
             Reset
           </Button>
         </div>
-        <p>
+        <p className="text-[#333] dark:text-white transition-color duration-500 ease-in-out">
           Already have an account? <Link href="/login">Log In</Link>
         </p>
       </Form>

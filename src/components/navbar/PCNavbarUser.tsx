@@ -17,7 +17,13 @@ export default function PCNavbarUser({ user }: NavbarUserProps) {
     <NavbarItem>
       <Dropdown>
         <DropdownTrigger>
-          <Avatar src={user.profilePicture} className="cursor-pointer" />
+          <Avatar
+            src={user.profilePicture}
+            className="cursor-pointer"
+            classNames={{
+              base: "bg-transparent",
+            }}
+          />
         </DropdownTrigger>
         <DropdownMenu>
           <DropdownItem
