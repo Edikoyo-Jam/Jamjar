@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { FeaturedStreamerType } from "@/types/FeaturedStreamerType";
 
-
 export default function Streams() {
   const [streamers, setStreamers] = useState<FeaturedStreamerType[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0); // State to track the currently displayed streamer
@@ -51,7 +50,7 @@ export default function Streams() {
   const currentStreamer = streamers[currentIndex]; // Get the currently displayed streamer
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
+    <div className="text-[#333] dark:text-white text-center p-6">
       <h1>Featured Streamer</h1>
       <div
         style={{
@@ -70,10 +69,22 @@ export default function Streams() {
           alt={`${currentStreamer.userName}'s thumbnail`}
           style={{ width: "100%", borderRadius: "4px", marginBottom: "10px" }}
         />
-        <a href={`https://twitch.tv/${currentStreamer.userName}`} target="_blank" ><div style={{height:"100px",display:"flex", flexDirection:"column",justifyContent:"center"}}>
-          <h3>{currentStreamer.userName}</h3>
-          <p>{currentStreamer.streamTitle}</p>
-        </div></a>
+        <a
+          href={`https://twitch.tv/${currentStreamer.userName}`}
+          target="_blank"
+        >
+          <div
+            style={{
+              height: "100px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <h3>{currentStreamer.userName}</h3>
+            <p>{currentStreamer.streamTitle}</p>
+          </div>
+        </a>
         <div>
           {currentStreamer.streamTags.map((tag, index) => (
             <span
