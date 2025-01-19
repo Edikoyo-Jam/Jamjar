@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MoonIcon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function ThemeToggle() {
@@ -19,7 +19,6 @@ export default function ThemeToggle() {
     setIsSpinning(true);
     setTimeout(() => setIsSpinning(false), 500);
 
-    console.log(theme);
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
@@ -34,7 +33,7 @@ export default function ThemeToggle() {
       className={`${isSpinning && "animate-[spin_0.5s_ease-out]"}  `}
     >
       <div className="duration-500 ease-in-out transition-all transform text-[#333] dark:text-white hover:scale-125">
-        {theme === "dark" && <MoonIcon />}
+        {theme === "dark" && <Moon />}
         {theme === "light" && <Sun />}
       </div>
     </div>
