@@ -1,5 +1,6 @@
 import Posts from "@/components/posts";
 import Timers from "@/components/timers";
+import Streams from "@/components/streams";
 import JamHeader from "@/components/jam-header";
 
 export default async function Home() {
@@ -11,6 +12,7 @@ export default async function Home() {
       </div>
       <div>
         <Timers />
+        <Streams />
       </div>
     </div>
   );
