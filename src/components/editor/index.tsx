@@ -42,7 +42,7 @@ type EditorProps = {
   setContent: (content: string) => void;
 };
 
-const limit = 200;
+const limit = 32767;
 
 export default function Editor({ content, setContent }: EditorProps) {
   const { theme } = useTheme();
