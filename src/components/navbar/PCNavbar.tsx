@@ -95,11 +95,11 @@ export default function PCNavbar() {
           >
             <Image
               as={NextImage}
-              src="/images/d2jam.png"
+              src="/images/hereyougopomo.png"
               className="min-w-[70px]"
               alt="Dare2Jam logo"
               width={70}
-              height={59.7}
+              height={70}
             />
           </Link>
         </NavbarBrand>
