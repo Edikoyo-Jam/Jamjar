@@ -6,7 +6,7 @@ import { Heart, LoaderCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { getCookie } from "@/helpers/cookie";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 
 export default function LikeButton({ post }: { post: PostType }) {
@@ -14,6 +14,21 @@ export default function LikeButton({ post }: { post: PostType }) {
   const [loading, setLoading] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
   const { theme } = useTheme();
+  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mediaQuery.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setReduceMotion(event.matches);
+    };
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
 
   return (
     <Button
@@ -56,7 +71,7 @@ export default function LikeButton({ post }: { post: PostType }) {
           if (response.status == 401) {
             redirect("/login");
           } else {
-            toast.error("An error occured");
+            toast.error("An error occurred");
             return;
           }
         } else {
@@ -79,7 +94,11 @@ export default function LikeButton({ post }: { post: PostType }) {
           <Heart size={16} />
           <Heart
             size={16}
-            className={liked ? "animate-ping absolute top-0 left-0" : ""}
+            className={
+              liked && !reduceMotion
+                ? "animate-ping absolute top-0 left-0"
+                : "absolute top-0 left-0"
+            }
             style={{
               position: "absolute",
               top: "0",

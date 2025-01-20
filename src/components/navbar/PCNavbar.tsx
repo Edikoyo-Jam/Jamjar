@@ -38,6 +38,21 @@ export default function PCNavbar() {
   const [jam, setJam] = useState<JamType | null>();
   const [isInJam, setIsInJam] = useState<boolean>();
   const [user, setUser] = useState<UserType>();
+  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mediaQuery.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setReduceMotion(event.matches);
+    };
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
 
   useEffect(() => {
     loadUser();
@@ -91,7 +106,9 @@ export default function PCNavbar() {
         <NavbarBrand className="flex-grow-0">
           <Link
             href="/"
-            className="duration-500 ease-in-out transition-all transform hover:scale-110"
+            className={`duration-500 ease-in-out transition-all transform ${
+              reduceMotion ? "" : "hover:scale-110"
+            }`}
           >
             <Image
               as={NextImage}
