@@ -46,7 +46,7 @@ export default function PostCard({
 
   return (
     <Card
-      className="bg-opacity-60 !duration-500 ease-in-out !transition-all"
+      className="bg-opacity-60 !duration-250 !ease-linear !transition-all"
       style={{ display: hidden ? "none" : "flex" }}
     >
       <CardBody className="p-5">
@@ -128,7 +128,7 @@ export default function PostCard({
               <Spacer y={4} />
 
               <div
-                className="prose dark:prose-invert transition-all !duration-500 ease-in-out"
+                className="prose dark:prose-invert !duration-250 !ease-linear !transition-all"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
 

@@ -32,7 +32,7 @@ export default function ThemeToggle() {
       style={{ cursor: "pointer" }}
       className={`${isSpinning && "animate-[spin_0.5s_ease-out]"}  `}
     >
-      <div className="duration-500 ease-in-out transition-all transform text-[#333] dark:text-white hover:scale-125">
+      <div className="!duration-250 !ease-linear !transition-all transform text-[#333] dark:text-white hover:scale-125">
         {resolvedTheme === "dark" && <Moon />}
         {resolvedTheme === "light" && <Sun />}
       </div>

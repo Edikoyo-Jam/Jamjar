@@ -97,7 +97,7 @@ export default function Editor({ content, setContent }: EditorProps) {
     editorProps: {
       attributes: {
         class:
-          "prose dark:prose-invert min-h-[150px] max-h-[400px] overflow-y-auto cursor-text rounded-md border p-5 focus-within:outline-none focus-within:border-blue-500 transform-all duration-500 ease-in-out",
+          "prose dark:prose-invert min-h-[150px] max-h-[400px] overflow-y-auto cursor-text rounded-md border p-5 focus-within:outline-none focus-within:border-blue-500 !duration-250 !ease-linear !transition-all",
       },
     },
   });
@@ -115,7 +115,7 @@ export default function Editor({ content, setContent }: EditorProps) {
               : editor.storage.characterCount.characters() > limit / 2
               ? "text-yellow-500"
               : "text-[#888] dark:text-[#555]"
-          } transform-color duration-500 ease-in-out flex items-center gap-3`}
+          } transform-color duration-250 ease-linear flex items-center gap-3`}
         >
           <svg width="30" height="30" viewBox="0 0 36 36">
             <circle
@@ -125,7 +125,7 @@ export default function Editor({ content, setContent }: EditorProps) {
               fill="none"
               stroke={theme === "dark" ? "#333" : "#eee"}
               strokeWidth="3"
-              className="transform-all duration-500 ease-in-out"
+              className="!duration-250 !ease-linear !transition-all"
             />
             <circle
               id="progress-circle"
@@ -146,7 +146,7 @@ export default function Editor({ content, setContent }: EditorProps) {
                 (1 - editor.storage.characterCount.characters() / limit) * 100
               }
               transform="rotate(-90 18 18)"
-              className="transform-all duration-500 ease-in-out"
+              className="!duration-250 !ease-linear !transition-all"
             />
           </svg>
           {editor.storage.characterCount.characters()} / {limit} characters

@@ -75,7 +75,7 @@ export default function Posts() {
             <DropdownTrigger>
               <Button
                 size="sm"
-                className="text-xs bg-white dark:bg-[#252525] transition-all !duration-500 ease-in-out text-[#333] dark:text-white"
+                className="text-xs bg-white dark:bg-[#252525] !duration-250 !ease-linear !transition-all text-[#333] dark:text-white"
                 variant="faded"
               >
                 {sort.charAt(0).toUpperCase() + sort.slice(1)}
@@ -94,7 +94,7 @@ export default function Posts() {
           </Dropdown>
           <Button
             size="sm"
-            className="text-xs bg-white dark:bg-[#252525] transition-all !duration-500 ease-in-out text-[#333] dark:text-white"
+            className="text-xs bg-white dark:bg-[#252525] !duration-250 !ease-linear !transition-all text-[#333] dark:text-white"
             variant="faded"
             onPress={() => {
               toast.warning("Flair filtering functionality coming soon");
@@ -108,7 +108,7 @@ export default function Posts() {
             <DropdownTrigger>
               <Button
                 size="sm"
-                className="text-xs bg-white dark:bg-[#252525] transition-all !duration-500 ease-in-out text-[#333] dark:text-white"
+                className="text-xs bg-white dark:bg-[#252525] !duration-250 !ease-linear !transition-all text-[#333] dark:text-white"
                 variant="faded"
               >
                 {style.charAt(0).toUpperCase() + style.slice(1)}

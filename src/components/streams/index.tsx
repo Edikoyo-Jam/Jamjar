@@ -50,7 +50,7 @@ export default function Streams() {
   const currentStreamer = streamers[currentIndex]; // Get the currently displayed streamer
 
   return (
-    <div className="text-[#333] dark:text-white text-center p-6">
+    <div className="text-[#333] dark:text-white text-center p-6 transition-color duration-250">
       <h1>Featured Streamer</h1>
       <div
         style={{
