@@ -1,1 +1,1 @@
-export type PostSort = "newest" | "oldest";
+export type PostSort = "newest" | "oldest" | "top";

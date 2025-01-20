@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { FeaturedStreamerType } from "@/types/FeaturedStreamerType";
+import { Image } from "@nextui-org/react";
+import NextImage from "next/image";
 
 export default function Streams() {
   const [streamers, setStreamers] = useState<FeaturedStreamerType[]>([]);
@@ -64,10 +66,13 @@ export default function Streams() {
           margin: "0 auto",
         }}
       >
-        <img
+        <Image
+          as={NextImage}
           src={currentStreamer.thumbnailUrl}
           alt={`${currentStreamer.userName}'s thumbnail`}
           style={{ width: "100%", borderRadius: "4px", marginBottom: "10px" }}
+          width={320}
+          height={180}
         />
         <a
           href={`https://twitch.tv/${currentStreamer.userName}`}
