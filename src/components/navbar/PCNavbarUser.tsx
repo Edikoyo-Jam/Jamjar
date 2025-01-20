@@ -28,7 +28,7 @@ export default function PCNavbarUser({ user }: NavbarUserProps) {
         <DropdownMenu>
           <DropdownItem
             key="profile"
-            className="text-black"
+            className="text-[#333] dark:text-white"
             href={`/u/${user.slug}`}
           >
             Profile
@@ -36,7 +36,7 @@ export default function PCNavbarUser({ user }: NavbarUserProps) {
           <DropdownItem
             showDivider
             key="settings"
-            className="text-black"
+            className="text-[#333] dark:text-white"
             href="/settings"
           >
             Settings

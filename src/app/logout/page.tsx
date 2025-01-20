@@ -6,11 +6,28 @@ import { toast } from "react-toastify";
 
 export default function UserPage() {
   useEffect(() => {
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    async function logout() {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_MODE === "PROD"
+          ? "https://d2jam.com/api/v1/logout"
+          : "http://localhost:3005/api/v1/logout",
+        { method: "POST", credentials: "include" }
+      );
 
-    toast.success("Successfully logged out");
+      if (response.ok) {
+        document.cookie =
+          "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie =
+          "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-    redirect("/");
+        toast.success("Successfully logged out");
+        redirect("/");
+      } else {
+        toast.error("Error while trying to log out");
+      }
+    }
+
+    logout();
   });
 
   return (
