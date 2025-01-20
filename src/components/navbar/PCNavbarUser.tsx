@@ -15,7 +15,7 @@ interface NavbarUserProps {
 export default function PCNavbarUser({ user }: NavbarUserProps) {
   return (
     <NavbarItem>
-      <Dropdown>
+      <Dropdown backdrop="opaque">
         <DropdownTrigger>
           <Avatar
             src={user.profilePicture}

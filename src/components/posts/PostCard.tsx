@@ -145,7 +145,7 @@ export default function PostCard({
                 >
                   <MessageCircle size={16} /> {0}
                 </Button>
-                <Dropdown>
+                <Dropdown backdrop="opaque">
                   <DropdownTrigger>
                     <Button size="sm" variant="bordered" isIconOnly>
                       <MoreVertical size={16} />

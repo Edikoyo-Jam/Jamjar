@@ -177,7 +177,7 @@ export default function Posts() {
     <div>
       <div className="flex justify-between p-4 pb-0">
         <div className="flex gap-2">
-          <Dropdown>
+          <Dropdown backdrop="opaque">
             <DropdownTrigger>
               <Button
                 size="sm"
@@ -204,7 +204,7 @@ export default function Posts() {
               ))}
             </DropdownMenu>
           </Dropdown>
-          <Dropdown>
+          <Dropdown backdrop="opaque">
             <DropdownTrigger>
               <Button
                 size="sm"
@@ -243,7 +243,7 @@ export default function Posts() {
           </Button>
         </div>
         <div>
-          <Dropdown>
+          <Dropdown backdrop="opaque">
             <DropdownTrigger>
               <Button
                 size="sm"
