@@ -60,7 +60,6 @@ export default function UserPage() {
 
           const { user } = await response.json();
           const token = response.headers.get("Authorization");
-          console.log(response.headers);
 
           if (!token) {
             toast.error("Failed to retreive access token");

@@ -1,7 +1,9 @@
 "use client";
 
 import { Button, Form, Input, Link } from "@nextui-org/react";
+import { redirect } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function UserPage() {
   const [username, setUsername] = useState("");
@@ -72,6 +74,7 @@ export default function UserPage() {
               body: JSON.stringify({ username: username, password: password }),
               method: "POST",
               headers: { "Content-Type": "application/json" },
+              credentials: "include",
             }
           );
 
@@ -81,13 +84,13 @@ export default function UserPage() {
             return;
           }
 
-          //   const { token, user } = await response.json();
-          //   document.cookie = `token=${token}`;
-          //   document.cookie = `user=${user.slug}`;
+          const { token, user } = await response.json();
+          document.cookie = `token=${token}`;
+          document.cookie = `user=${user.slug}`;
 
-          //   toast.success("Successfully signed up");
+          toast.success("Successfully signed up");
 
-          //   redirect("/");
+          redirect("/");
         }}
       >
         <Input
