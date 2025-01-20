@@ -75,7 +75,7 @@ export default function MobileNavbar() {
           >
             <Image
               as={NextImage}
-              src="/images/hereyougopomo.png"
+              src="/images/D2J_Icon.png"
               className="min-w-[70px]"
               alt="Dare2Jam logo"
               width={70}
