@@ -201,8 +201,8 @@ export default function PostCard({
                         <></>
                       )}
                     </DropdownSection>
-                    <DropdownSection title="Mod Zone">
-                      {user?.mod ? (
+                    {user?.mod ? (
+                      <DropdownSection title="Mod Zone">
                         <DropdownItem
                           key="remove"
                           startContent={<X />}
@@ -236,45 +236,45 @@ export default function PostCard({
                         >
                           Remove
                         </DropdownItem>
-                      ) : (
-                        <></>
-                      )}
-                      {user?.admin && !post.author.mod ? (
-                        <DropdownItem
-                          key="promote-mod"
-                          startContent={<Shield />}
-                          description="Promote user to Mod"
-                        >
-                          Appoint as mod
-                        </DropdownItem>
-                      ) : (
-                        <></>
-                      )}
-                      {user?.admin &&
-                      post.author.mod &&
-                      post.author.id !== user.id ? (
-                        <DropdownItem
-                          key="demote-mod"
-                          startContent={<ShieldX />}
-                          description="Demote user from Mod"
-                        >
-                          Remove as mod
-                        </DropdownItem>
-                      ) : (
-                        <></>
-                      )}
-                      {user?.admin && !post.author.admin ? (
-                        <DropdownItem
-                          key="promote-admin"
-                          startContent={<ShieldAlert />}
-                          description="Promote user to Admin"
-                        >
-                          Appoint as admin
-                        </DropdownItem>
-                      ) : (
-                        <></>
-                      )}
-                    </DropdownSection>
+                        {user?.admin && !post.author.mod ? (
+                          <DropdownItem
+                            key="promote-mod"
+                            startContent={<Shield />}
+                            description="Promote user to Mod"
+                          >
+                            Appoint as mod
+                          </DropdownItem>
+                        ) : (
+                          <></>
+                        )}
+                        {user?.admin &&
+                        post.author.mod &&
+                        post.author.id !== user.id ? (
+                          <DropdownItem
+                            key="demote-mod"
+                            startContent={<ShieldX />}
+                            description="Demote user from Mod"
+                          >
+                            Remove as mod
+                          </DropdownItem>
+                        ) : (
+                          <></>
+                        )}
+                        {user?.admin && !post.author.admin ? (
+                          <DropdownItem
+                            key="promote-admin"
+                            startContent={<ShieldAlert />}
+                            description="Promote user to Admin"
+                          >
+                            Appoint as admin
+                          </DropdownItem>
+                        ) : (
+                          <></>
+                        )}
+                      </DropdownSection>
+                    ) : (
+                      <></>
+                    )}
                   </DropdownMenu>
                 </Dropdown>
               </div>
