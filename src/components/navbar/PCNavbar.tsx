@@ -24,7 +24,7 @@ import NextImage from "next/image";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { getCookie, hasCookie } from "@/helpers/cookie";
-import { getCurrentJam, joinJam } from "@/helpers/jam";
+import { getCurrentJam, joinJam, ActiveJamResponse } from "@/helpers/jam";
 import { JamType } from "@/types/JamType";
 import { UserType } from "@/types/UserType";
 import NavbarUser from "./PCNavbarUser";
@@ -57,7 +57,8 @@ export default function PCNavbar() {
   useEffect(() => {
     loadUser();
     async function loadUser() {
-      const currentJam = await getCurrentJam();
+      const jamResponse = await getCurrentJam();
+      const currentJam = jamResponse?.jam;
       setJam(currentJam);
 
       if (!hasCookie("token")) {
@@ -141,7 +142,8 @@ export default function PCNavbar() {
             icon={<CalendarPlus />}
             name="Join jam"
             onPress={async () => {
-              const currentJam = await getCurrentJam();
+              const currentJamResponse = await getCurrentJam();
+              const currentJam = currentJamResponse?.jam;
 
               if (!currentJam) {
                 toast.error("There is no jam to join");

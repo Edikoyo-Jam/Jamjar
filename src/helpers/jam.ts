@@ -2,6 +2,11 @@ import { JamType } from "@/types/JamType";
 import { getCookie } from "./cookie";
 import { toast } from "react-toastify";
 
+export interface ActiveJamResponse {
+  phase: string;
+  jam: JamType | null; // Jam will be null if no active jam is found
+}
+
 export async function getJams(): Promise<JamType[]> {
   const response = await fetch(
     process.env.NEXT_PUBLIC_MODE === "PROD"
@@ -12,24 +17,29 @@ export async function getJams(): Promise<JamType[]> {
   return response.json();
 }
 
-export async function getCurrentJam(): Promise<JamType | null> {
-  const jams = await getJams();
-  const now = new Date();
+export async function getCurrentJam(): Promise<ActiveJamResponse | null> {
+  
+  try {
+    const response = await fetch(
+      process.env.NEXT_PUBLIC_MODE === "PROD"
+        ? "https://d2jam.com/api/v1/jams"
+        : "http://localhost:3005/api/v1/jams/active"
+    );
 
-  // Get only jams that happen in the future
-  const futureJams = jams.filter((jam) => new Date(jam.startTime) > now);
+    // Parse JSON response
+      const data = await response.json();
 
-  // If theres no jams happening returns null
-  if (futureJams.length === 0) {
-    return null;
-  }
+      // Return the phase and jam details
+      return {
+        phase: data.phase,
+        jam: data.jam,
+      };
 
-  // Sort future jams by startTime (earliest first)
-  futureJams.sort(
-    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-  );
+    } catch (error) {
+      console.error("Error fetching active jam:", error);
+      return null;
+    }
 
-  return futureJams[0];
 }
 
 export async function joinJam(jamId: number) {

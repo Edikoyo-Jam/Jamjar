@@ -27,7 +27,8 @@ export default function MobileNavbar() {
   useEffect(() => {
     loadUser();
     async function loadUser() {
-      const currentJam = await getCurrentJam();
+      const currentJamResponse = await getCurrentJam();
+      const currentJam = currentJamResponse?.jam;
       setJam(currentJam);
 
       if (!hasCookie("token")) {

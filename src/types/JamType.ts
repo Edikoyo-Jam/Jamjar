@@ -1,8 +1,11 @@
 export interface JamType {
   id: number;
   name: string;
-  ratingHours: number;
+  suggestionHours:number;
   slaughterHours: number;
+  votingHours:number;
+  jammingHours:number;
+  ratingHours: number;
   startTime: Date;
   createdAt: Date;
   updatedAt: Date;
