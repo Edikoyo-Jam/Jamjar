@@ -4,11 +4,16 @@ import { ReactNode, useEffect, useState } from "react";
 import PostCard from "./PostCard";
 import { PostType } from "@/types/PostType";
 import {
+  Avatar,
   Button,
+  Chip,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@nextui-org/react";
 import { PostSort } from "@/types/PostSort";
 import { PostStyle } from "@/types/PostStyle";
@@ -22,6 +27,7 @@ import {
   CalendarDays,
   CalendarFold,
   CalendarRange,
+  Check,
   Clock1,
   Clock2,
   Clock3,
@@ -31,9 +37,11 @@ import {
   LoaderCircle,
   Sparkles,
   Trophy,
+  X,
 } from "lucide-react";
-import { toast } from "react-toastify";
 import { PostTime } from "@/types/PostTimes";
+import { TagType } from "@/types/TagType";
+import { useTheme } from "next-themes";
 
 export default function Posts() {
   const [posts, setPosts] = useState<PostType[]>();
@@ -42,10 +50,62 @@ export default function Posts() {
   const [style, setStyle] = useState<PostStyle>("cozy");
   const [user, setUser] = useState<UserType>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [tags, setTags] = useState<{
+    [category: string]: { tags: TagType[]; priority: number };
+  }>();
+  const [tagRules, setTagRules] = useState<{ [key: number]: number }>();
+  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mediaQuery.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setReduceMotion(event.matches);
+    };
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
 
   useEffect(() => {
     const loadUserAndPosts = async () => {
       setLoading(true);
+
+      const tagResponse = await fetch(
+        process.env.NEXT_PUBLIC_MODE === "PROD"
+          ? `https://d2jam.com/api/v1/tags`
+          : `http://localhost:3005/api/v1/tags`
+      );
+
+      if (tagResponse.ok) {
+        const tagObject: {
+          [category: string]: { tags: TagType[]; priority: number };
+        } = {};
+
+        for (const tag of await tagResponse.json()) {
+          if (tag.name == "D2Jam") {
+            continue;
+          }
+
+          if (tag.category) {
+            if (tag.category.name in tagObject) {
+              tagObject[tag.category.name].tags.push(tag);
+            } else {
+              tagObject[tag.category.name] = {
+                tags: [tag],
+                priority: tag.category.priority,
+              };
+            }
+          }
+        }
+
+        setTags(tagObject);
+      }
+
       // Fetch the user
       const userResponse = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
@@ -64,8 +124,24 @@ export default function Posts() {
         // Fetch posts with userSlug if user is available
         const postsResponse = await fetch(
           process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? `https://d2jam.com/api/v1/posts?sort=${sort}&user=${userData.slug}&time=${time}`
-            : `http://localhost:3005/api/v1/posts?sort=${sort}&user=${userData.slug}&time=${time}`
+            ? `https://d2jam.com/api/v1/posts?sort=${sort}&user=${
+                userData.slug
+              }&time=${time}&tags=${
+                tagRules
+                  ? Object.entries(tagRules)
+                      .map((key) => `${key}`)
+                      .join("_")
+                  : ""
+              }`
+            : `http://localhost:3005/api/v1/posts?sort=${sort}&user=${
+                userData.slug
+              }&time=${time}&tags=${
+                tagRules
+                  ? Object.entries(tagRules)
+                      .map((key) => `${key}`)
+                      .join("_")
+                  : ""
+              }`
         );
         setPosts(await postsResponse.json());
         setLoading(false);
@@ -75,8 +151,20 @@ export default function Posts() {
         // Fetch posts without userSlug if user is not available
         const postsResponse = await fetch(
           process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? `https://d2jam.com/api/v1/posts?sort=${sort}&time=${time}`
-            : `http://localhost:3005/api/v1/posts?sort=${sort}&time=${time}`
+            ? `https://d2jam.com/api/v1/posts?sort=${sort}&time=${time}&tags=${
+                tagRules
+                  ? Object.entries(tagRules)
+                      .map((key, value) => `${key}-${value}`)
+                      .join("_")
+                  : ""
+              }`
+            : `http://localhost:3005/api/v1/posts?sort=${sort}&time=${time}&tags=${
+                tagRules
+                  ? Object.entries(tagRules)
+                      .map((key, value) => `${key}-${value}`)
+                      .join("_")
+                  : ""
+              }`
         );
         setPosts(await postsResponse.json());
         setLoading(false);
@@ -84,7 +172,7 @@ export default function Posts() {
     };
 
     loadUserAndPosts();
-  }, [sort, time]);
+  }, [sort, time, tagRules]);
 
   const sorts: Record<
     PostSort,
@@ -167,7 +255,7 @@ export default function Posts() {
       description: "Shows posts from the last year",
     },
     all: {
-      name: "All Times",
+      name: "All Time",
       icon: <Sparkles />,
       description: "Shows all posts",
     },
@@ -231,16 +319,110 @@ export default function Posts() {
               ))}
             </DropdownMenu>
           </Dropdown>
-          <Button
-            size="sm"
-            className="text-xs bg-white dark:bg-[#252525] !duration-250 !ease-linear !transition-all text-[#333] dark:text-white"
-            variant="faded"
-            onPress={() => {
-              toast.warning("Flair filtering functionality coming soon");
-            }}
-          >
-            All Tags
-          </Button>
+          <Popover placement="bottom" showArrow backdrop="opaque">
+            <PopoverTrigger>
+              <Button
+                size="sm"
+                className="text-xs bg-white dark:bg-[#252525] !duration-250 !ease-linear !transition-all text-[#333] dark:text-white"
+                variant="faded"
+              >
+                {tagRules && Object.keys(tagRules).length > 0
+                  ? "Custom Tags"
+                  : "All Tags"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="p-4 max-w-[800px] max-h-[400px] overflow-y-scroll">
+                <p className="text-2xl">Tag Filtering</p>
+                {tags && Object.keys(tags).length > 0 ? (
+                  Object.keys(tags)
+                    .sort(
+                      (tag1, tag2) => tags[tag2].priority - tags[tag1].priority
+                    )
+                    .map((category: string) => (
+                      <div key={category} className="w-full">
+                        <p>{category}</p>
+                        <div className="flex gap-1 flex-wrap p-4 w-full">
+                          {tags[category].tags.map((tag) => (
+                            <Chip
+                              size="sm"
+                              variant="faded"
+                              avatar={
+                                tag.icon && (
+                                  <Avatar
+                                    src={tag.icon}
+                                    classNames={{ base: "bg-transparent" }}
+                                  />
+                                )
+                              }
+                              key={tag.id}
+                              onClick={() => {
+                                if (!tagRules) {
+                                  setTagRules({ [tag.id]: 1 });
+                                } else {
+                                  if (tag.id in tagRules) {
+                                    if (tagRules[tag.id] === 1) {
+                                      setTagRules({
+                                        ...tagRules,
+                                        [tag.id]: -1,
+                                      });
+                                    } else {
+                                      const updatedRules = { ...tagRules };
+                                      delete updatedRules[tag.id];
+                                      setTagRules(updatedRules);
+                                    }
+                                  } else {
+                                    setTagRules({ ...tagRules, [tag.id]: 1 });
+                                  }
+                                }
+                              }}
+                              className={`transition-all transform duration-500 ease-in-out cursor-pointer ${
+                                !reduceMotion ? "hover:scale-110" : ""
+                              }`}
+                              style={{
+                                color:
+                                  tagRules && tag.id in tagRules
+                                    ? tagRules[tag.id] === 1
+                                      ? theme == "dark"
+                                        ? "#5ed4f7"
+                                        : "#05b7eb"
+                                      : theme == "dark"
+                                      ? "#f78e5e"
+                                      : "#eb2b05"
+                                    : "",
+                                borderColor:
+                                  tagRules && tag.id in tagRules
+                                    ? tagRules[tag.id] === 1
+                                      ? theme == "dark"
+                                        ? "#5ed4f7"
+                                        : "#05b7eb"
+                                      : theme == "dark"
+                                      ? "#f78e5e"
+                                      : "#eb2b05"
+                                    : "",
+                              }}
+                              endContent={
+                                tagRules &&
+                                tag.id in tagRules &&
+                                (tagRules[tag.id] === 1 ? (
+                                  <Check size={16} />
+                                ) : (
+                                  <X size={16} />
+                                ))
+                              }
+                            >
+                              {tag.name}
+                            </Chip>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                ) : (
+                  <p>No tags could be found</p>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
         <div>
           <Dropdown backdrop="opaque">

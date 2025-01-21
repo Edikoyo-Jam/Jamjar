@@ -2,18 +2,142 @@
 
 import Editor from "@/components/editor";
 import { getCookie, hasCookie } from "@/helpers/cookie";
-import { Button, Form, Input } from "@nextui-org/react";
+import { Avatar, Button, Form, Input, Spacer } from "@nextui-org/react";
 import { LoaderCircle } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import sanitizeHtml from "sanitize-html";
+import Select, { MultiValue, StylesConfig } from "react-select";
+import { useTheme } from "next-themes";
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [errors, setErrors] = useState({});
   const [waitingPost, setWaitingPost] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<MultiValue<{
+    value: string;
+    label: ReactNode;
+    isFixed: boolean;
+  }> | null>(null);
+  const [mounted, setMounted] = useState<boolean>(false);
+  const [options, setOptions] = useState<
+    {
+      value: string;
+      label: ReactNode;
+      id: number;
+      isFixed: boolean;
+    }[]
+  >();
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+
+    const load = async () => {
+      const tagResponse = await fetch(
+        process.env.NEXT_PUBLIC_MODE === "PROD"
+          ? `https://d2jam.com/api/v1/tags`
+          : `http://localhost:3005/api/v1/tags`
+      );
+
+      if (tagResponse.ok) {
+        const newoptions: {
+          value: string;
+          label: ReactNode;
+          id: number;
+          isFixed: boolean;
+        }[] = [];
+
+        for (const tag of await tagResponse.json()) {
+          newoptions.push({
+            value: tag.name,
+            id: tag.id,
+            label: (
+              <div className="flex gap-2 items-center">
+                {tag.icon && (
+                  <Avatar
+                    className="w-6 h-6 min-w-6 min-h-6"
+                    size="sm"
+                    src={tag.icon}
+                    classNames={{ base: "bg-transparent" }}
+                  />
+                )}
+                <p>{tag.name}</p>
+              </div>
+            ),
+            isFixed: tag.alwaysAdded,
+          });
+        }
+
+        setOptions(newoptions);
+        setSelectedTags(newoptions.filter((tag) => tag.isFixed));
+      }
+    };
+    load();
+  }, []);
+
+  const styles: StylesConfig<
+    {
+      value: string;
+      label: ReactNode;
+      isFixed: boolean;
+    },
+    true
+  > = {
+    multiValue: (base, state) => {
+      return {
+        ...base,
+        backgroundColor: state.data.isFixed
+          ? theme == "dark"
+            ? "#222"
+            : "#ddd"
+          : theme == "dark"
+          ? "#444"
+          : "#eee",
+      };
+    },
+    multiValueLabel: (base, state) => {
+      return {
+        ...base,
+        color: state.data.isFixed
+          ? theme == "dark"
+            ? "#ddd"
+            : "#222"
+          : theme == "dark"
+          ? "#fff"
+          : "#444",
+        fontWeight: state.data.isFixed ? "normal" : "bold",
+        paddingRight: state.data.isFixed ? "8px" : "2px",
+      };
+    },
+    multiValueRemove: (base, state) => {
+      return {
+        ...base,
+        display: state.data.isFixed ? "none" : "flex",
+        color: theme == "dark" ? "#ddd" : "#222",
+      };
+    },
+    control: (styles) => ({
+      ...styles,
+      backgroundColor: theme == "dark" ? "#181818" : "#fff",
+      minWidth: "300px",
+    }),
+    menu: (styles) => ({
+      ...styles,
+      backgroundColor: theme == "dark" ? "#181818" : "#fff",
+      color: theme == "dark" ? "#fff" : "#444",
+    }),
+    option: (styles, { isFocused }) => ({
+      ...styles,
+      backgroundColor: isFocused
+        ? theme == "dark"
+          ? "#333"
+          : "#ddd"
+        : undefined,
+    }),
+  };
 
   return (
     <div className="absolute flex items-center justify-center top-0 left-0 w-screen h-screen">
@@ -51,6 +175,16 @@ export default function CreatePostPage() {
           const sanitizedHtml = sanitizeHtml(content);
           setWaitingPost(true);
 
+          const tags = [];
+
+          if (selectedTags) {
+            for (const tag of selectedTags) {
+              tags.push(
+                options?.filter((option) => option.value == tag.value)[0].id
+              );
+            }
+          }
+
           const response = await fetch(
             process.env.NEXT_PUBLIC_MODE === "PROD"
               ? "https://d2jam.com/api/v1/post"
@@ -60,6 +194,7 @@ export default function CreatePostPage() {
                 title: title,
                 content: sanitizedHtml,
                 username: getCookie("user"),
+                tags,
               }),
               method: "POST",
               headers: {
@@ -98,6 +233,24 @@ export default function CreatePostPage() {
         />
 
         <Editor content={content} setContent={setContent} />
+
+        <Spacer />
+
+        {mounted && (
+          <Select
+            styles={styles}
+            isMulti
+            value={selectedTags}
+            onChange={(value) => setSelectedTags(value)}
+            options={options}
+            isClearable={false}
+            isOptionDisabled={() =>
+              selectedTags != null && selectedTags.length >= 5
+            }
+          />
+        )}
+
+        <Spacer />
 
         <div className="flex gap-2">
           <Button color="primary" type="submit">

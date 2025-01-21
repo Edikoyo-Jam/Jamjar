@@ -10,7 +10,7 @@ import { ThemeProvider } from "next-themes";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Dare2Jam",
+  title: "Down2Jam",
   description: "A community built game jam!",
 };
 

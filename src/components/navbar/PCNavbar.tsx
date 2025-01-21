@@ -114,7 +114,7 @@ export default function PCNavbar() {
               as={NextImage}
               src="/images/D2J_Icon.png"
               className="min-w-[70px]"
-              alt="Dare2Jam logo"
+              alt="Down2Jam logo"
               width={70}
               height={70}
             />

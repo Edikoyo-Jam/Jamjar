@@ -1,8 +1,11 @@
+"use client";
+
 import {
   Avatar,
   Button,
   Card,
   CardBody,
+  Chip,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -28,9 +31,10 @@ import {
 import LikeButton from "./LikeButton";
 import { PostStyle } from "@/types/PostStyle";
 import { UserType } from "@/types/UserType";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getCookie } from "@/helpers/cookie";
 import { toast } from "react-toastify";
+import { TagType } from "@/types/TagType";
 
 export default function PostCard({
   post,
@@ -43,6 +47,21 @@ export default function PostCard({
 }) {
   const [minimized, setMinimized] = useState<boolean>(false);
   const [hidden, setHidden] = useState<boolean>(false);
+  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mediaQuery.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setReduceMotion(event.matches);
+    };
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
 
   return (
     <Card
@@ -133,6 +152,43 @@ export default function PostCard({
               />
 
               <Spacer y={4} />
+
+              {post.tags.filter((tag) => tag.name != "D2Jam").length > 0 ? (
+                <div className="flex gap-1">
+                  {post.tags
+                    .filter((tag) => tag.name != "D2Jam")
+                    .map((tag: TagType) => (
+                      <Link
+                        href="/"
+                        key={tag.id}
+                        className={`transition-all transform duration-500 ease-in-out ${
+                          !reduceMotion ? "hover:scale-110" : ""
+                        }`}
+                      >
+                        <Chip
+                          radius="sm"
+                          size="sm"
+                          className="!duration-250 !ease-linear !transition-all"
+                          variant="faded"
+                          avatar={
+                            tag.icon && (
+                              <Avatar
+                                src={tag.icon}
+                                classNames={{ base: "bg-transparent" }}
+                              />
+                            )
+                          }
+                        >
+                          {tag.name}
+                        </Chip>
+                      </Link>
+                    ))}
+                </div>
+              ) : (
+                <></>
+              )}
+
+              {post.tags.length > 0 && <Spacer y={4} />}
 
               <div className="flex gap-3">
                 <LikeButton post={post} />
