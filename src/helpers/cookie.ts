@@ -9,6 +9,9 @@ export function getCookies() {
 }
 
 export function getCookie(cookie: string) {
+  if (typeof document === "undefined") {
+    return null;
+  }
   const pairs = document.cookie.split(";");
   for (let i = 0; i < pairs.length; i++) {
     const pair = pairs[i].trim().split("=");
