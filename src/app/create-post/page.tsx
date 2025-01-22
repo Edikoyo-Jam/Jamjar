@@ -36,6 +36,18 @@ export default function CreatePostPage() {
     setMounted(true);
 
     const load = async () => {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_MODE === "PROD"
+          ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
+          : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
+        {
+          headers: { authorization: `Bearer ${getCookie("token")}` },
+          credentials: "include",
+        }
+      );
+
+      const user = await response.json();
+
       const tagResponse = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
           ? `https://d2jam.com/api/v1/tags`
@@ -51,6 +63,9 @@ export default function CreatePostPage() {
         }[] = [];
 
         for (const tag of await tagResponse.json()) {
+          if (tag.modOnly && !user.mod) {
+            continue;
+          }
           newoptions.push({
             value: tag.name,
             id: tag.id,
@@ -64,7 +79,10 @@ export default function CreatePostPage() {
                     classNames={{ base: "bg-transparent" }}
                   />
                 )}
-                <p>{tag.name}</p>
+                <p>
+                  {tag.name}
+                  {tag.modOnly ? " (Mod Only)" : ""}
+                </p>
               </div>
             ),
             isFixed: tag.alwaysAdded,
