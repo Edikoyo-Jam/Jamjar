@@ -2,16 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { getCookie } from "@/helpers/cookie";
-import { getCurrentJam,ActiveJamResponse } from "@/helpers/jam";
+import { getCurrentJam, hasJoinedCurrentJam, ActiveJamResponse } from "@/helpers/jam";
 
 export default function ThemeSlaughter() {   
 
   const [randomTheme, setRandomTheme] = useState(null);
   const [votedThemes, setVotedThemes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(null); // Store token after fetching it on the client
+  const [token, setToken] = useState(null); 
+  const [hasJoined, setHasJoined] = useState<boolean>(false);
   const [activeJamResponse, setActiveJam] = useState<ActiveJamResponse | null>(null);
-  const [phaseLoading, setPhaseLoading] = useState(true); // Loading state for fetching phase
+  const [phaseLoading, setPhaseLoading] = useState(true);
 
   // Fetch token on the client side
   useEffect(() => {
@@ -155,10 +156,39 @@ export default function ThemeSlaughter() {
     }
   }, [token, activeJamResponse]);
 
-  // Render loading state while fetching phase
-  if (phaseLoading) {
+
+  useEffect(() => {
+      const init = async () => {
+        const joined = await hasJoinedCurrentJam();
+        setHasJoined(joined);
+        setLoading(false);
+      };
+  
+      init();
+    }, []);
+  
+  if (phaseLoading || loading) {
     return <div>Loading...</div>;
   }  
+
+  if (!hasJoined) {
+    return (
+      <div className="p-6 bg-gray-100 dark:bg-gray-800 min-h-screen">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+          Join the Jam First
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          You need to join the current jam before you can join Theme Survival.
+        </p>
+        <button
+          onClick={() => joinJam(activeJamResponse?.jam?.id)}
+          className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
+          Join Jam
+        </button>
+      </div>
+    );
+  }
 
   // Render message if not in Theme Slaughter phase
   if (activeJamResponse?.phase !== "Survival") {

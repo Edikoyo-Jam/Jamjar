@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { getCookie } from "@/helpers/cookie";
-import { getCurrentJam, ActiveJamResponse } from "@/helpers/jam";
+import { getCurrentJam, hasJoinedCurrentJam , ActiveJamResponse } from "@/helpers/jam";
 
 export default function VotingPage() {
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeJamResponse, setActiveJamResponse] = useState<ActiveJamResponse | null>(null);
+  const [hasJoined, setHasJoined] = useState<boolean>(false);
   const [phaseLoading, setPhaseLoading] = useState(true); // Loading state for fetching phase
   const token = getCookie("token");
 
@@ -127,12 +128,41 @@ export default function VotingPage() {
     }
   };
 
-  // Render loading state while fetching phase
-  if (phaseLoading) {
+  useEffect(() => {
+    const init = async () => {
+      const joined = await hasJoinedCurrentJam();
+      setHasJoined(joined);
+      setLoading(false);
+    };
+
+    init();
+  }, []);
+
+
+  if (phaseLoading || loading) {
     return <div>Loading...</div>;
   }
 
-  // Render message if not in Voting phase
+  if (!hasJoined) {
+    return (
+      <div className="p-6 bg-gray-100 dark:bg-gray-800 min-h-screen">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+          Join the Jam First
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          You need to join the current jam before you can vote themes.
+        </p>
+        <button
+          onClick={() => joinJam(activeJamResponse?.jam?.id)}
+          className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
+          Join Jam
+        </button>
+      </div>
+    );
+  }
+
+
   if (activeJamResponse?.phase !== "Voting") {
     return (
       <div className="p-4 bg-gray-100 dark:bg-gray-800 min-h-screen">

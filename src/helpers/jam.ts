@@ -53,6 +53,7 @@ export async function joinJam(jamId: number) {
         userSlug: getCookie("user"),
       }),
       method: "POST",
+      credentials: 'include',
       headers: {
         "Content-Type": "application/json",
         authorization: `Bearer ${getCookie("token")}`,
@@ -68,6 +69,27 @@ export async function joinJam(jamId: number) {
     return true;
   } else {
     toast.error("Error while trying to join jam");
+    return false;
+  }
+}
+
+export async function hasJoinedCurrentJam(): Promise<boolean> {
+  try {
+    const response = await fetch(
+      process.env.NEXT_PUBLIC_MODE === "PROD"
+        ? "https://d2jam.com/api/v1/participation"
+        : "http://localhost:3005/api/v1/participation",
+      {
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${getCookie("token")}`,
+        },
+      }
+    );
+
+    return response.ok;
+  } catch (error) {
+    console.error("Error checking jam participation:", error);
     return false;
   }
 }
