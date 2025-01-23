@@ -18,28 +18,25 @@ export async function getJams(): Promise<JamType[]> {
 }
 
 export async function getCurrentJam(): Promise<ActiveJamResponse | null> {
-  
   try {
     const response = await fetch(
       process.env.NEXT_PUBLIC_MODE === "PROD"
-        ? "https://d2jam.com/api/v1/jams"
+        ? "https://d2jam.com/api/v1/jams/active"
         : "http://localhost:3005/api/v1/jams/active"
     );
 
     // Parse JSON response
-      const data = await response.json();
+    const data = await response.json();
 
-      // Return the phase and jam details
-      return {
-        phase: data.phase,
-        jam: data.jam,
-      };
-
-    } catch (error) {
-      console.error("Error fetching active jam:", error);
-      return null;
-    }
-
+    // Return the phase and jam details
+    return {
+      phase: data.phase,
+      jam: data.jam,
+    };
+  } catch (error) {
+    console.error("Error fetching active jam:", error);
+    return null;
+  }
 }
 
 export async function joinJam(jamId: number) {
@@ -53,7 +50,7 @@ export async function joinJam(jamId: number) {
         userSlug: getCookie("user"),
       }),
       method: "POST",
-      credentials: 'include',
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         authorization: `Bearer ${getCookie("token")}`,
@@ -80,7 +77,7 @@ export async function hasJoinedCurrentJam(): Promise<boolean> {
         ? "https://d2jam.com/api/v1/participation"
         : "http://localhost:3005/api/v1/participation",
       {
-        credentials: 'include',
+        credentials: "include",
         headers: {
           Authorization: `Bearer ${getCookie("token")}`,
         },
