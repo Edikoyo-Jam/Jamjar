@@ -181,6 +181,29 @@ export default function ThemeSlaughter() {
     return <div>Loading...</div>;
   }
 
+  
+
+  // Render message if not in Theme Slaughter phase
+  if (activeJamResponse?.phase !== "Survival") {
+    return (
+      <div className="p-6 bg-gray-100 dark:bg-gray-800 min-h-screen">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+          Not in Theme Slaughter Phase
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          The current phase is{" "}
+          <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come
+          back during the Theme Slaughter phase.
+        </p>
+      </div>
+    );
+  }
+
+  const loggedIn = getCookie("token");
+  if (!loggedIn) {
+    return <div>Sign in to be able to join the Theme Survival</div>;
+  }
+
   if (!hasJoined) {
     return (
       <div className="p-6 bg-gray-100 dark:bg-gray-800 min-h-screen">
@@ -202,28 +225,6 @@ export default function ThemeSlaughter() {
         </button>
       </div>
     );
-  }
-
-  // Render message if not in Theme Slaughter phase
-  if (activeJamResponse?.phase !== "Survival") {
-    return (
-      <div className="p-6 bg-gray-100 dark:bg-gray-800 min-h-screen">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-          Not in Theme Slaughter Phase
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          The current phase is{" "}
-          <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come
-          back during the Theme Slaughter phase.
-        </p>
-      </div>
-    );
-  }
-
-  const loggedIn = getCookie("token");
-
-  if (!loggedIn) {
-    return <div>Sign in to be able to join the Theme Survival</div>;
   }
 
   return (

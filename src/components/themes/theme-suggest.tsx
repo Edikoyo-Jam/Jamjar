@@ -166,6 +166,12 @@ export default function ThemeSuggestions() {
     return <div>Loading...</div>;
   }
 
+  const token = getCookie("token");
+
+  if (!token) {
+    return <div>Sign in to be able to suggest themes</div>;
+  }
+
   if (!hasJoined) {
     return (
       <div className="p-6 bg-gray-100 dark:bg-gray-800 min-h-screen">
@@ -187,12 +193,6 @@ export default function ThemeSuggestions() {
         </button>
       </div>
     );
-  }
-
-  const token = getCookie("token");
-
-  if (!token) {
-    return <div>Sign in to be able to suggest themes</div>;
   }
 
   // Render message if not in Suggestion phase

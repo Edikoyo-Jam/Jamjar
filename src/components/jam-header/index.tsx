@@ -111,11 +111,10 @@ export default function JamHeader() {
         </div>
       </div>
 
-      {/* Phase-Specific Display */}
       {activeJamResponse?.phase === "Suggestion" && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 text-center rounded-b-2x">
           <a
-            // href="/theme-suggestions"
+             href="/theme-suggestions"
             className="text-blue-300 dark:text-blue-500 hover:underline font-semibold"
           >
             Go to Theme Suggestion
@@ -126,7 +125,7 @@ export default function JamHeader() {
       {activeJamResponse?.phase === "Survival" && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 text-center rounded-b-2x">
           <a
-            // href="/theme-slaughter"
+             href="/theme-slaughter"
             className="text-blue-300 dark:text-blue-500 hover:underline font-semibold"
           >
             Go to Theme Survival
@@ -137,7 +136,7 @@ export default function JamHeader() {
       {activeJamResponse?.phase === "Voting" && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 text-center rounded-b-2x">
           <a
-            // href="/theme-voting"
+             href="/theme-voting"
             className="text-blue-300 dark:text-blue-500 hover:underline font-semibold"
           >
             Go to Theme Voting

@@ -144,6 +144,27 @@ export default function VotingPage() {
     return <div>Loading...</div>;
   }
 
+  if (activeJamResponse?.phase !== "Voting") {
+    return (
+      <div className="p-4 bg-gray-100 dark:bg-gray-800 min-h-screen">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+          Not in Voting Phase
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          The current phase is{" "}
+          <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come
+          back during the Voting phase.
+        </p>
+      </div>
+    );
+  }
+
+  const loggedIn = getCookie("token");
+
+  if (!loggedIn) {
+    return <div>Sign in to be able to vote</div>;
+  }
+
   if (!hasJoined) {
     return (
       <div className="p-6 bg-gray-100 dark:bg-gray-800 min-h-screen">
@@ -165,27 +186,6 @@ export default function VotingPage() {
         </button>
       </div>
     );
-  }
-
-  if (activeJamResponse?.phase !== "Voting") {
-    return (
-      <div className="p-4 bg-gray-100 dark:bg-gray-800 min-h-screen">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-          Not in Voting Phase
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          The current phase is{" "}
-          <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come
-          back during the Voting phase.
-        </p>
-      </div>
-    );
-  }
-
-  const loggedIn = getCookie("token");
-
-  if (!loggedIn) {
-    return <div>Sign in to be able to vote</div>;
   }
 
   return (
