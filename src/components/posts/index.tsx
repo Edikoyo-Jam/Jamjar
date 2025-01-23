@@ -319,15 +319,11 @@ export default function Posts() {
         </div>
       ) : (
         <div className="flex flex-col gap-3 p-4">
-          {stickyPosts && stickyPosts.length > 0 ? (
+          {stickyPosts &&
+            stickyPosts.length > 0 &&
             stickyPosts.map((post) => (
               <StickyPostCard key={post.id} post={post} />
-            ))
-          ) : (
-            <p className="text-center text-[#333] dark:text-white transition-color duration-250 ease-linear">
-              No posts match your filters
-            </p>
-          )}
+            ))}
         </div>
       )}
 
