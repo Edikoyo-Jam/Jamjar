@@ -17,7 +17,8 @@ import { toast } from "react-toastify";
 import sanitizeHtml from "sanitize-html";
 import Select, { MultiValue, StylesConfig } from "react-select";
 import { useTheme } from "next-themes";
-import { UserType } from "@/types/UserType";
+import Timers from "@/components/timers";
+import Streams from "@/components/streams";
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState("");
@@ -168,7 +169,7 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="absolute flex items-center justify-center top-0 left-0 w-screen h-screen">
+    <div className="absolute flex items-top mt-40 justify-center top-0 left-0 w-screen h-screen">
       <Form
         className="w-full max-w-2xl flex flex-col gap-4"
         validationErrors={errors}
@@ -305,6 +306,10 @@ export default function CreatePostPage() {
           </Button>
         </div>
       </Form>
-    </div>
+      <div class="flex flex-col gap-4 px-8 items-end">
+        <Timers />
+        <Streams />
+      </div>
+    </div>    
   );
 }

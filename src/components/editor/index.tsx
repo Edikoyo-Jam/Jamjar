@@ -40,11 +40,12 @@ import { useTheme } from "next-themes";
 type EditorProps = {
   content: string;
   setContent: (content: string) => void;
+  gameEditor: boolean;
 };
 
 const limit = 32767;
 
-export default function Editor({ content, setContent }: EditorProps) {
+export default function Editor({ content, setContent,gameEditor }: EditorProps) {
   const { theme } = useTheme();
 
   const editor = useEditor({
@@ -97,7 +98,11 @@ export default function Editor({ content, setContent }: EditorProps) {
     editorProps: {
       attributes: {
         class:
-          "prose dark:prose-invert min-h-[150px] max-h-[400px] overflow-y-auto cursor-text rounded-md border p-5 focus-within:outline-none focus-within:border-blue-500 !duration-250 !ease-linear !transition-all",
+          "prose dark:prose-invert " +
+          (gameEditor
+            ? "min-h-[600px] max-h-[600px]"
+            : "min-h-[150px] max-h-[400px]") +
+          " overflow-y-auto cursor-text rounded-md border p-5 focus-within:outline-none focus-within:border-blue-500 !duration-250 !ease-linear !transition-all",
       },
     },
   });
