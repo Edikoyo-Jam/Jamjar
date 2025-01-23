@@ -42,9 +42,11 @@ import {
 import { PostTime } from "@/types/PostTimes";
 import { TagType } from "@/types/TagType";
 import { useTheme } from "next-themes";
+import StickyPostCard from "./StickyPostCard";
 
 export default function Posts() {
   const [posts, setPosts] = useState<PostType[]>();
+  const [stickyPosts, setStickyPosts] = useState<PostType[]>();
   const [sort, setSort] = useState<PostSort>("newest");
   const [time, setTime] = useState<PostTime>("all");
   const [style, setStyle] = useState<PostStyle>("cozy");
@@ -144,6 +146,31 @@ export default function Posts() {
               }`
         );
         setPosts(await postsResponse.json());
+
+        // Sticky posts
+        // Fetch posts with userSlug if user is available
+        const stickyPostsResponse = await fetch(
+          process.env.NEXT_PUBLIC_MODE === "PROD"
+            ? `https://d2jam.com/api/v1/posts?sort=${sort}&user=${
+                userData.slug
+              }&time=${time}&tags=${
+                tagRules
+                  ? Object.entries(tagRules)
+                      .map((key) => `${key}`)
+                      .join("_")
+                  : ""
+              }&sticky=true`
+            : `http://localhost:3005/api/v1/posts?sort=${sort}&user=${
+                userData.slug
+              }&time=${time}&tags=${
+                tagRules
+                  ? Object.entries(tagRules)
+                      .map((key) => `${key}`)
+                      .join("_")
+                  : ""
+              }&sticky=true`
+        );
+        setStickyPosts(await stickyPostsResponse.json());
         setLoading(false);
       } else {
         setUser(undefined);
@@ -167,6 +194,26 @@ export default function Posts() {
               }`
         );
         setPosts(await postsResponse.json());
+
+        // Fetch posts without userSlug if user is not available
+        const stickyPostsResponse = await fetch(
+          process.env.NEXT_PUBLIC_MODE === "PROD"
+            ? `https://d2jam.com/api/v1/posts?sort=${sort}&time=${time}&tags=${
+                tagRules
+                  ? Object.entries(tagRules)
+                      .map((key, value) => `${key}-${value}`)
+                      .join("_")
+                  : ""
+              }&sticky=true`
+            : `http://localhost:3005/api/v1/posts?sort=${sort}&time=${time}&tags=${
+                tagRules
+                  ? Object.entries(tagRules)
+                      .map((key, value) => `${key}-${value}`)
+                      .join("_")
+                  : ""
+              }&sticky=true`
+        );
+        setStickyPosts(await stickyPostsResponse.json());
         setLoading(false);
       }
     };
@@ -263,6 +310,27 @@ export default function Posts() {
 
   return (
     <div>
+      {loading ? (
+        <div className="flex justify-center p-6">
+          <LoaderCircle
+            className="animate-spin text-[#333] dark:text-[#999]"
+            size={24}
+          />
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3 p-4">
+          {stickyPosts && stickyPosts.length > 0 ? (
+            stickyPosts.map((post) => (
+              <StickyPostCard key={post.id} post={post} />
+            ))
+          ) : (
+            <p className="text-center text-[#333] dark:text-white transition-color duration-250 ease-linear">
+              No posts match your filters
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="flex justify-between p-4 pb-0">
         <div className="flex gap-2">
           <Dropdown backdrop="opaque">

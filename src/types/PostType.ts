@@ -5,6 +5,7 @@ export interface PostType {
   id: number;
   slug: string;
   title: string;
+  sticky: boolean;
   content: string;
   author: UserType;
   createdAt: Date;

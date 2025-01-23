@@ -2,7 +2,14 @@
 
 import Editor from "@/components/editor";
 import { getCookie, hasCookie } from "@/helpers/cookie";
-import { Avatar, Button, Form, Input, Spacer } from "@nextui-org/react";
+import {
+  Avatar,
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  Spacer,
+} from "@nextui-org/react";
 import { LoaderCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
@@ -10,6 +17,7 @@ import { toast } from "react-toastify";
 import sanitizeHtml from "sanitize-html";
 import Select, { MultiValue, StylesConfig } from "react-select";
 import { useTheme } from "next-themes";
+import { UserType } from "@/types/UserType";
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState("");
@@ -31,6 +39,8 @@ export default function CreatePostPage() {
     }[]
   >();
   const { theme } = useTheme();
+  const [user, setUser] = useState<UserType>();
+  const [sticky, setSticky] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -46,7 +56,8 @@ export default function CreatePostPage() {
         }
       );
 
-      const user = await response.json();
+      const localuser = await response.json();
+      setUser(localuser);
 
       const tagResponse = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
@@ -63,7 +74,7 @@ export default function CreatePostPage() {
         }[] = [];
 
         for (const tag of await tagResponse.json()) {
-          if (tag.modOnly && !user.mod) {
+          if (tag.modOnly && !localuser.mod) {
             continue;
           }
           newoptions.push({
@@ -90,7 +101,6 @@ export default function CreatePostPage() {
         }
 
         setOptions(newoptions);
-        setSelectedTags(newoptions.filter((tag) => tag.isFixed));
       }
     };
     load();
@@ -211,8 +221,14 @@ export default function CreatePostPage() {
               body: JSON.stringify({
                 title: title,
                 content: sanitizedHtml,
+                sticky,
                 username: getCookie("user"),
-                tags,
+                tags: [
+                  ...tags,
+                  ...(options
+                    ? options.filter((tag) => tag.isFixed).map((tag) => tag.id)
+                    : []),
+                ],
               }),
               method: "POST",
               headers: {
@@ -266,6 +282,15 @@ export default function CreatePostPage() {
               selectedTags != null && selectedTags.length >= 5
             }
           />
+        )}
+
+        {user && user.mod && (
+          <div>
+            <Spacer />
+            <Checkbox isSelected={sticky} onValueChange={setSticky}>
+              Sticky
+            </Checkbox>
+          </div>
         )}
 
         <Spacer />

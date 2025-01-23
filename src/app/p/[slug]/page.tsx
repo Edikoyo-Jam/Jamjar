@@ -28,6 +28,8 @@ import {
   Shield,
   ShieldAlert,
   ShieldX,
+  Star,
+  StarOff,
   Trash,
   X,
 } from "lucide-react";
@@ -295,6 +297,81 @@ export default function PostPage() {
                             >
                               Remove
                             </DropdownItem>
+                            {post.sticky ? (
+                              <DropdownItem
+                                key="unsticky"
+                                startContent={<StarOff />}
+                                description="Unsticky post"
+                                onPress={async () => {
+                                  const response = await fetch(
+                                    process.env.NEXT_PUBLIC_MODE === "PROD"
+                                      ? "https://d2jam.com/api/v1/post/sticky"
+                                      : "http://localhost:3005/api/v1/post/sticky",
+                                    {
+                                      body: JSON.stringify({
+                                        postId: post.id,
+                                        sticky: false,
+                                        username: getCookie("user"),
+                                      }),
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                        authorization: `Bearer ${getCookie(
+                                          "token"
+                                        )}`,
+                                      },
+                                      credentials: "include",
+                                    }
+                                  );
+
+                                  if (response.ok) {
+                                    toast.success("Unsticked post");
+                                    redirect("/");
+                                  } else {
+                                    toast.error("Error while removing post");
+                                  }
+                                }}
+                              >
+                                Unsticky
+                              </DropdownItem>
+                            ) : (
+                              <DropdownItem
+                                key="sticky"
+                                startContent={<Star />}
+                                description="Sticky post"
+                                onPress={async () => {
+                                  const response = await fetch(
+                                    process.env.NEXT_PUBLIC_MODE === "PROD"
+                                      ? "https://d2jam.com/api/v1/post/sticky"
+                                      : "http://localhost:3005/api/v1/post/sticky",
+                                    {
+                                      body: JSON.stringify({
+                                        postId: post.id,
+                                        sticky: true,
+                                        username: getCookie("user"),
+                                      }),
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                        authorization: `Bearer ${getCookie(
+                                          "token"
+                                        )}`,
+                                      },
+                                      credentials: "include",
+                                    }
+                                  );
+
+                                  if (response.ok) {
+                                    toast.success("Unsticked post");
+                                    redirect("/");
+                                  } else {
+                                    toast.error("Error while removing post");
+                                  }
+                                }}
+                              >
+                                Sticky
+                              </DropdownItem>
+                            )}
                             {user?.admin && !post.author.mod ? (
                               <DropdownItem
                                 key="promote-mod"
