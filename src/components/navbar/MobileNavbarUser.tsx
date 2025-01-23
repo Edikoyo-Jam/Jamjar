@@ -19,7 +19,7 @@ interface NavbarUserProps {
   isInJam?: boolean;
 }
 
-export default function MobileNavbarUser({
+export default async function MobileNavbarUser({
   user,
   jam,
   setIsInJam,
@@ -38,7 +38,7 @@ export default function MobileNavbarUser({
           />
         </DropdownTrigger>
         <DropdownMenu>
-          {jam && isInJam ? (
+          {jam && (await getCurrentJam())?.jam && isInJam ? (
             <DropdownItem
               key="create-game"
               href="/create-game"
@@ -47,7 +47,7 @@ export default function MobileNavbarUser({
               Create Game
             </DropdownItem>
           ) : null}
-          {jam && !isInJam ? (
+          {jam && (await getCurrentJam())?.jam && !isInJam ? (
             <DropdownItem
               key="join-event"
               className="text-black"
@@ -55,12 +55,12 @@ export default function MobileNavbarUser({
                 try {
                   const currentJam = await getCurrentJam();
 
-                  if (!currentJam) {
+                  if (!currentJam || !currentJam.jam) {
                     toast.error("There is no jam to join");
                     return;
                   }
 
-                  if (await joinJam(currentJam.id)) {
+                  if (await joinJam(currentJam.jam.id)) {
                     setIsInJam(true);
                   }
                 } catch (error) {
