@@ -42,7 +42,7 @@ const [gameSlug, setGameSlug] = useState("");
 const [thumbnailUrl, setThumbnailUrl] = useState("");
 const [authorSearch, setAuthorSearch] = useState("");
 const [selectedAuthors, setSelectedAuthors] = useState<Array<{id: number, name: string}>>([]);
-const [searchResults, setSearchResults] = useState([]);
+const [searchResults, setSearchResults] = useState<Array<{ id: number; name: string }>>([]);
 
 // Add this function to handle author search
 const handleAuthorSearch = async (query: string) => {

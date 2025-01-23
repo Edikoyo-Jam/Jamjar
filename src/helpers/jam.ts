@@ -74,8 +74,8 @@ export async function hasJoinedCurrentJam(): Promise<boolean> {
   try {
     const response = await fetch(
       process.env.NEXT_PUBLIC_MODE === "PROD"
-        ? "https://d2jam.com/api/v1/participation"
-        : "http://localhost:3005/api/v1/participation",
+        ? "https://d2jam.com/api/v1/jams/participation"
+        : "http://localhost:3005/api/v1/jams/participation",
       {
         credentials: "include",
         headers: {

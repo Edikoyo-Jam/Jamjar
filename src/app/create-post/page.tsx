@@ -19,6 +19,7 @@ import Select, { MultiValue, StylesConfig } from "react-select";
 import { useTheme } from "next-themes";
 import Timers from "@/components/timers";
 import Streams from "@/components/streams";
+import { UserType } from "@/types/UserType";
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState("");
@@ -306,7 +307,7 @@ export default function CreatePostPage() {
           </Button>
         </div>
       </Form>
-      <div class="flex flex-col gap-4 px-8 items-end">
+      <div className="flex flex-col gap-4 px-8 items-end">
         <Timers />
         <Streams />
       </div>

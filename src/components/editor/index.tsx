@@ -40,7 +40,7 @@ import { useTheme } from "next-themes";
 type EditorProps = {
   content: string;
   setContent: (content: string) => void;
-  gameEditor: boolean;
+  gameEditor?: boolean;
 };
 
 const limit = 32767;

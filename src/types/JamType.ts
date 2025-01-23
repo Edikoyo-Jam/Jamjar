@@ -9,4 +9,5 @@ export interface JamType {
   startTime: Date;
   createdAt: Date;
   updatedAt: Date;
+  themePerUser: number;
 }
