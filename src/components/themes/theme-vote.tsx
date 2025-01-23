@@ -2,12 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { getCookie } from "@/helpers/cookie";
-import { getCurrentJam, hasJoinedCurrentJam , ActiveJamResponse } from "@/helpers/jam";
+import {
+  getCurrentJam,
+  hasJoinedCurrentJam,
+  ActiveJamResponse,
+} from "@/helpers/jam";
 
 export default function VotingPage() {
   const [themes, setThemes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [activeJamResponse, setActiveJamResponse] = useState<ActiveJamResponse | null>(null);
+  const [activeJamResponse, setActiveJamResponse] =
+    useState<ActiveJamResponse | null>(null);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
   const [phaseLoading, setPhaseLoading] = useState(true); // Loading state for fetching phase
   const token = getCookie("token");
@@ -28,67 +33,66 @@ export default function VotingPage() {
     fetchCurrentJamPhase();
   }, []);
 
-  // Fetch top N themes with voting scores
-  const fetchThemes = async () => {
-    if (!token || !activeJamResponse) return;
-  
-    try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/themes/top-themes"
-          : "http://localhost:3005/api/v1/themes/top-themes",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          credentials: "include",
-        }
-      );
-      if (response.ok) {
-        const themes = await response.json();
-        console.log("Fetched themes:", themes); // Debug log
-        
-        // Fetch user's votes for these themes
-        const votesResponse = await fetch(
+  // Fetch themes only when phase is "Voting"
+  useEffect(() => {
+    // Fetch top N themes with voting scores
+    async function fetchThemes() {
+      if (!token || !activeJamResponse) return;
+
+      try {
+        const response = await fetch(
           process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? "https://d2jam.com/api/v1/themes/votes"
-            : "http://localhost:3005/api/v1/themes/votes",
+            ? "https://d2jam.com/api/v1/themes/top-themes"
+            : "http://localhost:3005/api/v1/themes/top-themes",
           {
             headers: { Authorization: `Bearer ${token}` },
             credentials: "include",
           }
         );
-  
-        if (votesResponse.ok) {
-          const votes = await votesResponse.json();
-          console.log("Fetched votes:", votes); // Debug log
-          
-          // Merge themes with user's votes
-          const themesWithVotes = themes.map(theme => {
-            const vote = votes.find(v => v.themeSuggestionId === theme.id);
-            console.log(`Theme ${theme.id} vote:`, vote); // Debug log
-            return {
-              ...theme,
-              votingScore: vote ? vote.votingScore : null
-            };
-          });
-          
-          console.log("Themes with votes:", themesWithVotes); // Debug log
-          setThemes(themesWithVotes);
-        }
-      } else {
-        console.error("Failed to fetch themes.");
-      }
-    } catch (error) {
-      console.error("Error fetching themes:", error);
-    }
-  };
+        if (response.ok) {
+          const themes = await response.json();
+          console.log("Fetched themes:", themes); // Debug log
 
-  
-  // Fetch themes only when phase is "Voting"
-  useEffect(() => {
+          // Fetch user's votes for these themes
+          const votesResponse = await fetch(
+            process.env.NEXT_PUBLIC_MODE === "PROD"
+              ? "https://d2jam.com/api/v1/themes/votes"
+              : "http://localhost:3005/api/v1/themes/votes",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+              credentials: "include",
+            }
+          );
+
+          if (votesResponse.ok) {
+            const votes = await votesResponse.json();
+            console.log("Fetched votes:", votes); // Debug log
+
+            // Merge themes with user's votes
+            const themesWithVotes = themes.map((theme) => {
+              const vote = votes.find((v) => v.themeSuggestionId === theme.id);
+              console.log(`Theme ${theme.id} vote:`, vote); // Debug log
+              return {
+                ...theme,
+                votingScore: vote ? vote.votingScore : null,
+              };
+            });
+
+            console.log("Themes with votes:", themesWithVotes); // Debug log
+            setThemes(themesWithVotes);
+          }
+        } else {
+          console.error("Failed to fetch themes.");
+        }
+      } catch (error) {
+        console.error("Error fetching themes:", error);
+      }
+    }
+
     if (activeJamResponse?.phase === "Voting") {
       fetchThemes();
     }
-  }, [activeJamResponse]);
+  }, [activeJamResponse, token]);
 
   // Handle voting
   const handleVote = async (themeId, votingScore) => {
@@ -108,14 +112,12 @@ export default function VotingPage() {
           body: JSON.stringify({ suggestionId: themeId, votingScore }),
         }
       );
-  
+
       if (response.ok) {
         // Just update the local state instead of re-fetching all themes
         setThemes((prevThemes) =>
           prevThemes.map((theme) =>
-            theme.id === themeId 
-              ? { ...theme, votingScore } 
-              : theme
+            theme.id === themeId ? { ...theme, votingScore } : theme
           )
         );
       } else {
@@ -137,7 +139,6 @@ export default function VotingPage() {
 
     init();
   }, []);
-
 
   if (phaseLoading || loading) {
     return <div>Loading...</div>;
@@ -162,7 +163,6 @@ export default function VotingPage() {
     );
   }
 
-
   if (activeJamResponse?.phase !== "Voting") {
     return (
       <div className="p-4 bg-gray-100 dark:bg-gray-800 min-h-screen">
@@ -170,19 +170,19 @@ export default function VotingPage() {
           Not in Voting Phase
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          The current phase is <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come back during the Voting phase.
+          The current phase is{" "}
+          <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come
+          back during the Voting phase.
         </p>
       </div>
     );
   }
 
   const loggedIn = getCookie("token");
-    
-    if (!loggedIn) {
-    return (
-        <div>Sign in to be able to vote</div>
-    );
-    }
+
+  if (!loggedIn) {
+    return <div>Sign in to be able to vote</div>;
+  }
 
   return (
     <div className="p-3 bg-gray-100 dark:bg-gray-800 min-h-screen">
@@ -233,7 +233,9 @@ export default function VotingPage() {
             </div>
 
             {/* Theme Suggestion */}
-            <div className="text-gray-800 dark:text-white">{theme.suggestion}</div>
+            <div className="text-gray-800 dark:text-white">
+              {theme.suggestion}
+            </div>
           </div>
         ))}
       </div>

@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { getCookie } from "@/helpers/cookie";
-import { getCurrentJam, hasJoinedCurrentJam , ActiveJamResponse } from "@/helpers/jam";
+import {
+  getCurrentJam,
+  hasJoinedCurrentJam,
+  ActiveJamResponse,
+} from "@/helpers/jam";
 
 export default function ThemeSuggestions() {
   const [suggestion, setSuggestion] = useState("");
@@ -12,7 +16,8 @@ export default function ThemeSuggestions() {
   const [userSuggestions, setUserSuggestions] = useState([]);
   const [themeLimit, setThemeLimit] = useState(0);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
-  const [activeJamResponse, setActiveJamResponse] = useState<ActiveJamResponse | null>(null);
+  const [activeJamResponse, setActiveJamResponse] =
+    useState<ActiveJamResponse | null>(null);
   const [phaseLoading, setPhaseLoading] = useState(true); // Loading state for fetching phase
 
   // Fetch the current jam phase using helpers/jam
@@ -105,9 +110,14 @@ export default function ThemeSuggestions() {
       setSuccessMessage("Suggestion added successfully!");
       setSuggestion(""); // Clear input field
       fetchSuggestions(); // Refresh suggestions list
-    } catch (error: any) {
-      console.error("Error submitting suggestion:", error.message);
-      setErrorMessage(error.message || "An unexpected error occurred.");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error submitting suggestion:", error.message);
+        setErrorMessage(error.message || "An unexpected error occurred.");
+      } else {
+        console.error("Unknown error:", error);
+        setErrorMessage("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
@@ -176,9 +186,7 @@ export default function ThemeSuggestions() {
   const token = getCookie("token");
 
   if (!token) {
-    return (
-      <div>Sign in to be able to suggest themes</div>
-    );
+    return <div>Sign in to be able to suggest themes</div>;
   }
 
   // Render message if not in Suggestion phase
@@ -189,7 +197,9 @@ export default function ThemeSuggestions() {
           Not in Suggestion Phase
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          The current phase is <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come back during the Suggestion phase.
+          The current phase is{" "}
+          <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come
+          back during the Suggestion phase.
         </p>
       </div>
     );
@@ -214,7 +224,7 @@ export default function ThemeSuggestions() {
               }
             }}
             rows={1}
-            maxLength={32} 
+            maxLength={32}
           ></textarea>
           {errorMessage && (
             <p className="text-red-500 text-sm">{errorMessage}</p>
@@ -234,7 +244,7 @@ export default function ThemeSuggestions() {
         </form>
       ) : (
         <p className="text-yellow-500 text-sm">
-          You've reached your theme suggestion limit for this jam!
+          You&apos;ve reached your theme suggestion limit for this jam!
         </p>
       )}
 
@@ -262,7 +272,7 @@ export default function ThemeSuggestions() {
           </ul>
         ) : (
           <p className="text-gray-600 dark:text-gray-400">
-            You haven't submitted any suggestions yet.
+            You haven&apos;t submitted any suggestions yet.
           </p>
         )}
       </div>

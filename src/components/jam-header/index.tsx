@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { getCurrentJam, ActiveJamResponse } from "../../helpers/jam";
 
 export default function JamHeader() {
-  const [activeJamResponse, setActiveJamResponse] = useState<ActiveJamResponse | null>(null);
+  const [activeJamResponse, setActiveJamResponse] =
+    useState<ActiveJamResponse | null>(null);
   const [topTheme, setTopTheme] = useState<string | null>(null);
 
   // Fetch active jam details
@@ -40,15 +41,18 @@ export default function JamHeader() {
     fetchData();
   }, []);
 
-
-    // Helper function to get ordinal suffix
+  // Helper function to get ordinal suffix
   const getOrdinalSuffix = (day: number): string => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
-      case 1: return "st";
-      case 2: return "nd";
-      case 3: return "rd";
-      default: return "th";
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
     }
   };
 
@@ -69,34 +73,49 @@ export default function JamHeader() {
           </p>
         </div>
         <div className="p-4 px-6 font-bold">
-        <p>
-          {activeJamResponse?.jam ? (
-            <>
-              {new Date(activeJamResponse.jam.startTime).toLocaleDateString('en-US', {
-                month: 'long',
-              })} {new Date(activeJamResponse.jam.startTime).getDate()}
-              {getOrdinalSuffix(new Date(activeJamResponse.jam.startTime).getDate())}
-              {" - "}
-              {new Date(new Date(activeJamResponse.jam.startTime).getTime() + 
-                (activeJamResponse.jam.jammingHours * 60 * 60 * 1000)).toLocaleDateString('en-US', {
-                month: 'long',
-              })} {new Date(new Date(activeJamResponse.jam.startTime).getTime() + 
-                (activeJamResponse.jam.jammingHours * 60 * 60 * 1000)).getDate()}
-              {getOrdinalSuffix(new Date(new Date(activeJamResponse.jam.startTime).getTime() + 
-                (activeJamResponse.jam.jammingHours * 60 * 60 * 1000)).getDate())}
-            </>
-          ) : (
-            "Dates TBA"
-          )}
-        </p>
-      </div>
+          <p>
+            {activeJamResponse?.jam ? (
+              <>
+                {new Date(activeJamResponse.jam.startTime).toLocaleDateString(
+                  "en-US",
+                  {
+                    month: "long",
+                  }
+                )}{" "}
+                {new Date(activeJamResponse.jam.startTime).getDate()}
+                {getOrdinalSuffix(
+                  new Date(activeJamResponse.jam.startTime).getDate()
+                )}
+                {" - "}
+                {new Date(
+                  new Date(activeJamResponse.jam.startTime).getTime() +
+                    activeJamResponse.jam.jammingHours * 60 * 60 * 1000
+                ).toLocaleDateString("en-US", {
+                  month: "long",
+                })}{" "}
+                {new Date(
+                  new Date(activeJamResponse.jam.startTime).getTime() +
+                    activeJamResponse.jam.jammingHours * 60 * 60 * 1000
+                ).getDate()}
+                {getOrdinalSuffix(
+                  new Date(
+                    new Date(activeJamResponse.jam.startTime).getTime() +
+                      activeJamResponse.jam.jammingHours * 60 * 60 * 1000
+                  ).getDate()
+                )}
+              </>
+            ) : (
+              "Dates TBA"
+            )}
+          </p>
+        </div>
       </div>
 
       {/* Phase-Specific Display */}
       {activeJamResponse?.phase === "Suggestion" && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 text-center rounded-b-2x">
           <a
-            href="/theme-suggestions"
+            // href="/theme-suggestions"
             className="text-blue-300 dark:text-blue-500 hover:underline font-semibold"
           >
             Go to Theme Suggestion
@@ -107,7 +126,7 @@ export default function JamHeader() {
       {activeJamResponse?.phase === "Survival" && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 text-center rounded-b-2x">
           <a
-            href="/theme-slaughter"
+            // href="/theme-slaughter"
             className="text-blue-300 dark:text-blue-500 hover:underline font-semibold"
           >
             Go to Theme Survival
@@ -118,7 +137,7 @@ export default function JamHeader() {
       {activeJamResponse?.phase === "Voting" && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 text-center rounded-b-2x">
           <a
-            href="/theme-voting"
+            // href="/theme-voting"
             className="text-blue-300 dark:text-blue-500 hover:underline font-semibold"
           >
             Go to Theme Voting
@@ -139,7 +158,9 @@ export default function JamHeader() {
       {activeJamResponse?.phase === "Rating" && (
         <div className="bg-gray-100 dark:bg-gray-800 p-4 text-center rounded-b-2x">
           {topTheme ? (
-            <p className="text-xl font-bold text-blue-500">THEME: {topTheme} RESULTS</p>
+            <p className="text-xl font-bold text-blue-500">
+              THEME: {topTheme} RESULTS
+            </p>
           ) : (
             <p>No top-scoring theme available.</p>
           )}

@@ -1,6 +1,5 @@
 import Timers from "@/components/timers";
 import Streams from "@/components/streams";
-import JamHeader from "@/components/jam-header";
 import ThemeVoting from "@/components/themes/theme-vote";
 
 export default async function Home() {

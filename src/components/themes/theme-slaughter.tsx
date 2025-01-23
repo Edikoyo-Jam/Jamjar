@@ -1,17 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { getCookie } from "@/helpers/cookie";
-import { getCurrentJam, hasJoinedCurrentJam, ActiveJamResponse } from "@/helpers/jam";
+import {
+  getCurrentJam,
+  hasJoinedCurrentJam,
+  ActiveJamResponse,
+} from "@/helpers/jam";
 
-export default function ThemeSlaughter() {   
-
+export default function ThemeSlaughter() {
   const [randomTheme, setRandomTheme] = useState(null);
   const [votedThemes, setVotedThemes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(null); 
+  const [token, setToken] = useState(null);
   const [hasJoined, setHasJoined] = useState<boolean>(false);
-  const [activeJamResponse, setActiveJam] = useState<ActiveJamResponse | null>(null);
+  const [activeJamResponse, setActiveJam] = useState<ActiveJamResponse | null>(
+    null
+  );
   const [phaseLoading, setPhaseLoading] = useState(true);
 
   // Fetch token on the client side
@@ -20,8 +25,8 @@ export default function ThemeSlaughter() {
     setToken(fetchedToken);
   }, []);
 
-    // Fetch the current jam phase using helpers/jam
-    useEffect(() => {
+  // Fetch the current jam phase using helpers/jam
+  useEffect(() => {
     const fetchCurrentJamPhase = async () => {
       try {
         const activeJam = await getCurrentJam();
@@ -36,19 +41,21 @@ export default function ThemeSlaughter() {
     fetchCurrentJamPhase();
   }, []);
 
-
   // Fetch a random theme
-  const fetchRandomTheme = async () => {
+  const fetchRandomTheme = useCallback(async () => {
     if (!token) return; // Wait until token is available
-    if( !activeJamResponse) return;
-    if(activeJamResponse && activeJamResponse.jam && activeJamResponse.phase != "Survival")
-        {
-            return (
-                <div>
-                <h1>It's not Theme Survival phase.</h1>
-                </div>
-            );
-        }
+    if (!activeJamResponse) return;
+    if (
+      activeJamResponse &&
+      activeJamResponse.jam &&
+      activeJamResponse.phase != "Survival"
+    ) {
+      return (
+        <div>
+          <h1>It&apos;s not Theme Survival phase.</h1>
+        </div>
+      );
+    }
 
     try {
       const response = await fetch(
@@ -69,10 +76,10 @@ export default function ThemeSlaughter() {
     } catch (error) {
       console.error("Error fetching random theme:", error);
     }
-  };
+  }, [activeJamResponse, token]);
 
   // Fetch voted themes
-  const fetchVotedThemes = async () => {
+  const fetchVotedThemes = useCallback(async () => {
     if (!token) return; // Wait until token is available
 
     try {
@@ -94,7 +101,7 @@ export default function ThemeSlaughter() {
     } catch (error) {
       console.error("Error fetching voted themes:", error);
     }
-  };
+  }, [token]);
 
   // Handle voting
   const handleVote = async (voteType) => {
@@ -148,28 +155,26 @@ export default function ThemeSlaughter() {
     }
   };
 
-
   useEffect(() => {
     if (token && activeJamResponse?.phase === "Survival") {
       fetchRandomTheme();
       fetchVotedThemes();
     }
-  }, [token, activeJamResponse]);
-
+  }, [token, activeJamResponse, fetchRandomTheme, fetchVotedThemes]);
 
   useEffect(() => {
-      const init = async () => {
-        const joined = await hasJoinedCurrentJam();
-        setHasJoined(joined);
-        setLoading(false);
-      };
-  
-      init();
-    }, []);
-  
+    const init = async () => {
+      const joined = await hasJoinedCurrentJam();
+      setHasJoined(joined);
+      setLoading(false);
+    };
+
+    init();
+  }, []);
+
   if (phaseLoading || loading) {
     return <div>Loading...</div>;
-  }  
+  }
 
   if (!hasJoined) {
     return (
@@ -198,20 +203,19 @@ export default function ThemeSlaughter() {
           Not in Theme Slaughter Phase
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          The current phase is <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come back during the Theme Slaughter phase.
+          The current phase is{" "}
+          <strong>{activeJamResponse?.phase || "Unknown"}</strong>. Please come
+          back during the Theme Slaughter phase.
         </p>
       </div>
     );
   }
 
   const loggedIn = getCookie("token");
-  
-    if (!loggedIn) {
-      return (
-        <div>Sign in to be able to join the Theme Survival</div>
-      );
-    }
-  
+
+  if (!loggedIn) {
+    return <div>Sign in to be able to join the Theme Survival</div>;
+  }
 
   return (
     <div className="flex h-screen">
@@ -223,7 +227,7 @@ export default function ThemeSlaughter() {
               {randomTheme.suggestion}
             </h2>
             <div className="flex gap-4">
-            <button
+              <button
                 onClick={() => handleVote("YES")}
                 className="px-6 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600"
                 disabled={loading}
@@ -247,7 +251,9 @@ export default function ThemeSlaughter() {
             </div>
           </>
         ) : (
-          <p className="text-gray-600 dark:text-gray-400">No themes available.</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            No themes available.
+          </p>
         )}
       </div>
 

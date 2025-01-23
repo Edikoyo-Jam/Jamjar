@@ -24,7 +24,7 @@ import NextImage from "next/image";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { getCookie, hasCookie } from "@/helpers/cookie";
-import { getCurrentJam, joinJam, ActiveJamResponse } from "@/helpers/jam";
+import { getCurrentJam, joinJam } from "@/helpers/jam";
 import { JamType } from "@/types/JamType";
 import { UserType } from "@/types/UserType";
 import NavbarUser from "./PCNavbarUser";
