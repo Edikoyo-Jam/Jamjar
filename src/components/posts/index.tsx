@@ -318,13 +318,14 @@ export default function Posts() {
           />
         </div>
       ) : (
-        <div className="flex flex-col gap-3 p-4">
-          {stickyPosts &&
-            stickyPosts.length > 0 &&
-            stickyPosts.map((post) => (
+        stickyPosts &&
+        stickyPosts.length > 0 && (
+          <div className="flex flex-col gap-3 p-4">
+            {stickyPosts.map((post) => (
               <StickyPostCard key={post.id} post={post} />
             ))}
-        </div>
+          </div>
+        )
       )}
 
       <div className="flex justify-between p-4 pb-0">
