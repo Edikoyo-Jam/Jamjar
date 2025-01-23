@@ -1,0 +1,348 @@
+"use client";
+
+import LikeButton from "@/components/posts/LikeButton";
+import { getCookie } from "@/helpers/cookie";
+import { PostType } from "@/types/PostType";
+import { TagType } from "@/types/TagType";
+import { UserType } from "@/types/UserType";
+import Link from "next/link";
+import {
+  Avatar,
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownSection,
+  DropdownTrigger,
+  Spacer,
+} from "@nextui-org/react";
+import { formatDistance } from "date-fns";
+import {
+  Flag,
+  LoaderCircle,
+  MessageCircle,
+  MoreVertical,
+  Shield,
+  ShieldAlert,
+  ShieldX,
+  Trash,
+  X,
+} from "lucide-react";
+import { redirect, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+
+export default function PostPage() {
+  const [post, setPost] = useState<PostType>();
+  const { slug } = useParams();
+  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
+  const [user, setUser] = useState<UserType>();
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mediaQuery.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setReduceMotion(event.matches);
+    };
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const loadUserAndPosts = async () => {
+      setLoading(true);
+
+      // Fetch the user
+      const userResponse = await fetch(
+        process.env.NEXT_PUBLIC_MODE === "PROD"
+          ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
+          : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
+        {
+          headers: { authorization: `Bearer ${getCookie("token")}` },
+          credentials: "include",
+        }
+      );
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        setUser(userData);
+
+        const postResponse = await fetch(
+          process.env.NEXT_PUBLIC_MODE === "PROD"
+            ? `https://d2jam.com/api/v1/post?slug=${slug}&user=${userData.slug}`
+            : `http://localhost:3005/api/v1/post?slug=${slug}&user=${userData.slug}`
+        );
+        setPost(await postResponse.json());
+        setLoading(false);
+      } else {
+        setUser(undefined);
+
+        const postResponse = await fetch(
+          process.env.NEXT_PUBLIC_MODE === "PROD"
+            ? `https://d2jam.com/api/v1/post?slug=${slug}`
+            : `http://localhost:3005/api/v1/post?slug=${slug}`
+        );
+        setPost(await postResponse.json());
+        setLoading(false);
+      }
+    };
+
+    loadUserAndPosts();
+  }, [slug]);
+
+  return (
+    <>
+      {loading ? (
+        <div className="flex justify-center p-6">
+          <LoaderCircle
+            className="animate-spin text-[#333] dark:text-[#999]"
+            size={24}
+          />
+        </div>
+      ) : (
+        <Card className="bg-opacity-60 !duration-250 !ease-linear !transition-all">
+          <CardBody className="p-5">
+            <div>
+              {post && (
+                <div>
+                  <Link href={`/p/${post.slug}`}>
+                    <p className="text-2xl">{post.title}</p>
+                  </Link>
+
+                  <div className="flex items-center gap-3 text-xs text-default-500 pt-1">
+                    <p>By</p>
+                    <Link
+                      href={`/u/${post.author.slug}`}
+                      className="flex items-center gap-2"
+                    >
+                      <Avatar
+                        size="sm"
+                        className="w-6 h-6"
+                        src={post.author.profilePicture}
+                        classNames={{
+                          base: "bg-transparent",
+                        }}
+                      />
+                      <p>{post.author.name}</p>
+                    </Link>
+                    <p>
+                      {formatDistance(new Date(post.createdAt), new Date(), {
+                        addSuffix: true,
+                      })}
+                    </p>
+                  </div>
+
+                  <Spacer y={4} />
+
+                  <div
+                    className="prose dark:prose-invert !duration-250 !ease-linear !transition-all"
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                  />
+
+                  <Spacer y={4} />
+
+                  {post.tags.filter((tag) => tag.name != "D2Jam").length > 0 ? (
+                    <div className="flex gap-1">
+                      {post.tags
+                        .filter((tag) => tag.name != "D2Jam")
+                        .map((tag: TagType) => (
+                          <Link
+                            href="/"
+                            key={tag.id}
+                            className={`transition-all transform duration-500 ease-in-out ${
+                              !reduceMotion ? "hover:scale-110" : ""
+                            }`}
+                          >
+                            <Chip
+                              radius="sm"
+                              size="sm"
+                              className="!duration-250 !ease-linear !transition-all"
+                              variant="faded"
+                              avatar={
+                                tag.icon && (
+                                  <Avatar
+                                    src={tag.icon}
+                                    classNames={{ base: "bg-transparent" }}
+                                  />
+                                )
+                              }
+                            >
+                              {tag.name}
+                            </Chip>
+                          </Link>
+                        ))}
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+
+                  {post.tags.length > 0 && <Spacer y={4} />}
+
+                  <div className="flex gap-3">
+                    <LikeButton post={post} />
+                    <Button
+                      size="sm"
+                      variant="bordered"
+                      onPress={() => {
+                        toast.warning("Comment functionality coming soon");
+                      }}
+                    >
+                      <MessageCircle size={16} /> {0}
+                    </Button>
+                    <Dropdown backdrop="opaque">
+                      <DropdownTrigger>
+                        <Button size="sm" variant="bordered" isIconOnly>
+                          <MoreVertical size={16} />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu className="text-[#333] dark:text-white">
+                        <DropdownSection
+                          showDivider={user?.mod}
+                          title="Actions"
+                        >
+                          <DropdownItem
+                            key="report"
+                            startContent={<Flag />}
+                            description="Report this post to moderators to handle"
+                            onPress={() => {
+                              toast.warning("Report functionality coming soon");
+                            }}
+                          >
+                            Create Report
+                          </DropdownItem>
+                          {user?.slug == post.author.slug ? (
+                            <DropdownItem
+                              key="delete"
+                              startContent={<Trash />}
+                              description="Delete your post"
+                              onPress={async () => {
+                                const response = await fetch(
+                                  process.env.NEXT_PUBLIC_MODE === "PROD"
+                                    ? "https://d2jam.com/api/v1/post"
+                                    : "http://localhost:3005/api/v1/post",
+                                  {
+                                    body: JSON.stringify({
+                                      postId: post.id,
+                                      username: getCookie("user"),
+                                    }),
+                                    method: "DELETE",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      authorization: `Bearer ${getCookie(
+                                        "token"
+                                      )}`,
+                                    },
+                                    credentials: "include",
+                                  }
+                                );
+
+                                if (response.ok) {
+                                  toast.success("Deleted post");
+                                  redirect("/");
+                                } else {
+                                  toast.error("Error while deleting post");
+                                }
+                              }}
+                            >
+                              Delete
+                            </DropdownItem>
+                          ) : (
+                            <></>
+                          )}
+                        </DropdownSection>
+                        {user?.mod ? (
+                          <DropdownSection title="Mod Zone">
+                            <DropdownItem
+                              key="remove"
+                              startContent={<X />}
+                              description="Remove this post"
+                              onPress={async () => {
+                                const response = await fetch(
+                                  process.env.NEXT_PUBLIC_MODE === "PROD"
+                                    ? "https://d2jam.com/api/v1/post"
+                                    : "http://localhost:3005/api/v1/post",
+                                  {
+                                    body: JSON.stringify({
+                                      postId: post.id,
+                                      username: getCookie("user"),
+                                    }),
+                                    method: "DELETE",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      authorization: `Bearer ${getCookie(
+                                        "token"
+                                      )}`,
+                                    },
+                                    credentials: "include",
+                                  }
+                                );
+
+                                if (response.ok) {
+                                  toast.success("Removed post");
+                                  redirect("/");
+                                } else {
+                                  toast.error("Error while removing post");
+                                }
+                              }}
+                            >
+                              Remove
+                            </DropdownItem>
+                            {user?.admin && !post.author.mod ? (
+                              <DropdownItem
+                                key="promote-mod"
+                                startContent={<Shield />}
+                                description="Promote user to Mod"
+                              >
+                                Appoint as mod
+                              </DropdownItem>
+                            ) : (
+                              <></>
+                            )}
+                            {user?.admin &&
+                            post.author.mod &&
+                            post.author.id !== user.id ? (
+                              <DropdownItem
+                                key="demote-mod"
+                                startContent={<ShieldX />}
+                                description="Demote user from Mod"
+                              >
+                                Remove as mod
+                              </DropdownItem>
+                            ) : (
+                              <></>
+                            )}
+                            {user?.admin && !post.author.admin ? (
+                              <DropdownItem
+                                key="promote-admin"
+                                startContent={<ShieldAlert />}
+                                description="Promote user to Admin"
+                              >
+                                Appoint as admin
+                              </DropdownItem>
+                            ) : (
+                              <></>
+                            )}
+                          </DropdownSection>
+                        ) : (
+                          <></>
+                        )}
+                      </DropdownMenu>
+                    </Dropdown>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+    </>
+  );
+}

@@ -73,7 +73,9 @@ export default function PostCard({
           (minimized ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <p>{post.title}</p>
+                <Link href={`/p/${post.slug}`}>
+                  <p>{post.title}</p>
+                </Link>
 
                 <div className="flex items-center gap-3 text-xs text-default-500 pt-1">
                   <p>By</p>
@@ -110,7 +112,9 @@ export default function PostCard({
           ) : (
             <div>
               <div className="flex justify-between items-center">
-                <p className="text-2xl">{post.title}</p>
+                <Link href={`/p/${post.slug}`}>
+                  <p className="text-2xl">{post.title}</p>
+                </Link>
                 <Button
                   size="sm"
                   variant="light"
@@ -338,7 +342,9 @@ export default function PostCard({
           ))}
         {style == "compact" && (
           <div>
-            <p className="text-2xl">{post.title}</p>
+            <Link href={`/p/${post.slug}`}>
+              <p className="text-2xl">{post.title}</p>
+            </Link>
 
             <div className="flex items-center gap-3 text-xs text-default-500 pt-1">
               <p>By</p>
@@ -366,7 +372,9 @@ export default function PostCard({
         )}
         {style == "ultra" && (
           <div className="flex items-center gap-4">
-            <p>{post.title}</p>
+            <Link href={`/p/${post.slug}`}>
+              <p>{post.title}</p>
+            </Link>
 
             <div className="flex items-center gap-3 text-xs text-default-500 pt-1">
               <p>By</p>
