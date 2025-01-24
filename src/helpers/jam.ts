@@ -31,7 +31,7 @@ export async function getCurrentJam(): Promise<ActiveJamResponse | null> {
     // Return the phase and jam details
     return {
       phase: data.phase,
-      jam: data.jam,
+      jam: data.futureJam,
     };
   } catch (error) {
     console.error("Error fetching active jam:", error);
