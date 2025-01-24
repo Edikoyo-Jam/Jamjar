@@ -377,6 +377,37 @@ export default function PostPage() {
                                 key="promote-mod"
                                 startContent={<Shield />}
                                 description="Promote user to Mod"
+                                onPress={async () => {
+                                  const response = await fetch(
+                                    process.env.NEXT_PUBLIC_MODE === "PROD"
+                                      ? "https://d2jam.com/api/v1/mod"
+                                      : "http://localhost:3005/api/v1/mod",
+                                    {
+                                      body: JSON.stringify({
+                                        targetname: post.author.slug,
+                                        mod: true,
+                                        username: getCookie("user"),
+                                      }),
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                        authorization: `Bearer ${getCookie(
+                                          "token"
+                                        )}`,
+                                      },
+                                      credentials: "include",
+                                    }
+                                  );
+
+                                  if (response.ok) {
+                                    toast.success("Promoted User to Mod");
+                                    window.location.reload();
+                                  } else {
+                                    toast.error(
+                                      "Error while promoting user to Mod"
+                                    );
+                                  }
+                                }}
                               >
                                 Appoint as mod
                               </DropdownItem>
@@ -385,11 +416,39 @@ export default function PostPage() {
                             )}
                             {user?.admin &&
                             post.author.mod &&
-                            post.author.id !== user.id ? (
+                            !post.author.admin ? (
                               <DropdownItem
                                 key="demote-mod"
                                 startContent={<ShieldX />}
                                 description="Demote user from Mod"
+                                onPress={async () => {
+                                  const response = await fetch(
+                                    process.env.NEXT_PUBLIC_MODE === "PROD"
+                                      ? "https://d2jam.com/api/v1/mod"
+                                      : "http://localhost:3005/api/v1/mod",
+                                    {
+                                      body: JSON.stringify({
+                                        targetname: post.author.slug,
+                                        username: getCookie("user"),
+                                      }),
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                        authorization: `Bearer ${getCookie(
+                                          "token"
+                                        )}`,
+                                      },
+                                      credentials: "include",
+                                    }
+                                  );
+
+                                  if (response.ok) {
+                                    toast.success("Demoted User");
+                                    window.location.reload();
+                                  } else {
+                                    toast.error("Error while demoting user");
+                                  }
+                                }}
                               >
                                 Remove as mod
                               </DropdownItem>
@@ -401,8 +460,83 @@ export default function PostPage() {
                                 key="promote-admin"
                                 startContent={<ShieldAlert />}
                                 description="Promote user to Admin"
+                                onPress={async () => {
+                                  const response = await fetch(
+                                    process.env.NEXT_PUBLIC_MODE === "PROD"
+                                      ? "https://d2jam.com/api/v1/mod"
+                                      : "http://localhost:3005/api/v1/mod",
+                                    {
+                                      body: JSON.stringify({
+                                        targetname: post.author.slug,
+                                        admin: true,
+                                        username: getCookie("user"),
+                                      }),
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                        authorization: `Bearer ${getCookie(
+                                          "token"
+                                        )}`,
+                                      },
+                                      credentials: "include",
+                                    }
+                                  );
+
+                                  if (response.ok) {
+                                    toast.success("Promoted User to Admin");
+                                    window.location.reload();
+                                  } else {
+                                    toast.error(
+                                      "Error while promoting user to Admin"
+                                    );
+                                  }
+                                }}
                               >
                                 Appoint as admin
+                              </DropdownItem>
+                            ) : (
+                              <></>
+                            )}
+                            {user?.admin &&
+                            post.author.admin &&
+                            post.author.id !== user.id ? (
+                              <DropdownItem
+                                key="demote-admin"
+                                startContent={<ShieldX />}
+                                description="Demote user to mod"
+                                onPress={async () => {
+                                  const response = await fetch(
+                                    process.env.NEXT_PUBLIC_MODE === "PROD"
+                                      ? "https://d2jam.com/api/v1/mod"
+                                      : "http://localhost:3005/api/v1/mod",
+                                    {
+                                      body: JSON.stringify({
+                                        targetname: post.author.slug,
+                                        mod: true,
+                                        username: getCookie("user"),
+                                      }),
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                        authorization: `Bearer ${getCookie(
+                                          "token"
+                                        )}`,
+                                      },
+                                      credentials: "include",
+                                    }
+                                  );
+
+                                  if (response.ok) {
+                                    toast.success("Demoted User to Mod");
+                                    window.location.reload();
+                                  } else {
+                                    toast.error(
+                                      "Error while demoting user to mod"
+                                    );
+                                  }
+                                }}
+                              >
+                                Remove as admin
                               </DropdownItem>
                             ) : (
                               <></>
