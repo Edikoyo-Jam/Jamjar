@@ -2,14 +2,12 @@
 
 import Editor from "@/components/editor";
 import { getCookie } from "@/helpers/cookie";
-import { Avatar, Button, Form, Input, Spacer } from "@nextui-org/react";
+import {  Button, Form, Input, Spacer } from "@nextui-org/react";
 import { LoaderCircle } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import sanitizeHtml from "sanitize-html";
-import ReactSelect, { MultiValue, StylesConfig } from "react-select";
 import { Select, SelectItem } from "@nextui-org/react";
-import { useTheme } from "next-themes";
 import Timers from "@/components/timers";
 import Streams from "@/components/streams";
 import { UserType } from "@/types/UserType";
@@ -37,15 +35,7 @@ export default function CreateGamePage() {
   }> | null>(null);
    */
   const [mounted, setMounted] = useState<boolean>(false);
-  const [options, setOptions] = useState<
-    {
-      value: string;
-      label: ReactNode;
-      id: number;
-      isFixed: boolean;
-    }[]
-  >();
-  const { theme } = useTheme();
+
   const [gameSlug, setGameSlug] = useState("");
   const [prevSlug, setPrevGameSlug] = useState("");
   const [game, setGame] = useState<GameType>();
@@ -219,68 +209,6 @@ export default function CreateGamePage() {
     
   },[user,mounted]);
   
-
-
-  const styles: StylesConfig<
-    {
-      value: string;
-      label: ReactNode;
-      isFixed: boolean;
-    },
-    true
-  > = {
-    multiValue: (base, state) => {
-      return {
-        ...base,
-        backgroundColor: state.data.isFixed
-          ? theme == "dark"
-            ? "#222"
-            : "#ddd"
-          : theme == "dark"
-          ? "#444"
-          : "#eee",
-      };
-    },
-    multiValueLabel: (base, state) => {
-      return {
-        ...base,
-        color: state.data.isFixed
-          ? theme == "dark"
-            ? "#ddd"
-            : "#222"
-          : theme == "dark"
-          ? "#fff"
-          : "#444",
-        fontWeight: state.data.isFixed ? "normal" : "bold",
-        paddingRight: state.data.isFixed ? "8px" : "2px",
-      };
-    },
-    multiValueRemove: (base, state) => {
-      return {
-        ...base,
-        display: state.data.isFixed ? "none" : "flex",
-        color: theme == "dark" ? "#ddd" : "#222",
-      };
-    },
-    control: (styles) => ({
-      ...styles,
-      backgroundColor: theme == "dark" ? "#181818" : "#fff",
-      minWidth: "300px",
-    }),
-    menu: (styles) => ({
-      ...styles,
-      backgroundColor: theme == "dark" ? "#181818" : "#fff",
-      color: theme == "dark" ? "#fff" : "#444",
-    }),
-    option: (styles, { isFocused }) => ({
-      ...styles,
-      backgroundColor: isFocused
-        ? theme == "dark"
-          ? "#333"
-          : "#ddd"
-        : undefined,
-    }),
-  };
 
   return (
     <div className="static flex items-top mt-20 justify-center top-0 left-0">
