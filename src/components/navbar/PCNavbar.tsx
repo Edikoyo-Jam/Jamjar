@@ -26,6 +26,7 @@ import { usePathname } from "next/navigation";
 import { getCookie, hasCookie } from "@/helpers/cookie";
 import { getCurrentJam, joinJam } from "@/helpers/jam";
 import { JamType } from "@/types/JamType";
+import { GameType } from "@/types/GameType";
 import { UserType } from "@/types/UserType";
 import NavbarUser from "./PCNavbarUser";
 import NavbarButtonAction from "./NavbarButtonAction";
@@ -39,6 +40,7 @@ export default function PCNavbar() {
   const [isInJam, setIsInJam] = useState<boolean>();
   const [user, setUser] = useState<UserType>();
   const [reduceMotion, setReduceMotion] = useState<boolean>(false);
+  const [hasGame, setHasGame] = useState<GameType | null>();
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -60,12 +62,12 @@ export default function PCNavbar() {
       const jamResponse = await getCurrentJam();
       const currentJam = jamResponse?.jam;
       setJam(currentJam);
-
+  
       if (!hasCookie("token")) {
         setUser(undefined);
         return;
       }
-
+  
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
           ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
@@ -75,9 +77,41 @@ export default function PCNavbar() {
           credentials: "include",
         }
       );
-
+  
       const user = await response.json();
-
+  
+      // Check if user has a game in current jam
+      const gameResponse = await fetch(
+        process.env.NEXT_PUBLIC_MODE === "PROD"
+          ? `https://d2jam.com/api/v1/self/current-game?username=${getCookie("user")}`
+          : `http://localhost:3005/api/v1/self/current-game?username=${getCookie("user")}`,
+        {
+          headers: { authorization: `Bearer ${getCookie("token")}` },
+          credentials: "include",
+        }
+      );
+  
+      if (gameResponse.ok) {
+        const gameData = await gameResponse.json();
+        console.log("Game Data:", gameData); // Log game data
+        console.log("User Data:", user); // Log user data
+      
+        if (gameData) {
+          // Check if the logged-in user is either the creator or a contributor
+          const isContributor =
+            gameData.author?.id === user.id || // Check if logged-in user is the author
+            gameData.contributors?.some((contributor: UserType) => contributor.id === user.id); // Check if logged-in user is a contributor
+      
+          console.log("Is Contributor:", isContributor); // Log whether the user is a contributor
+      
+          if (isContributor) {
+            setHasGame(gameData); // Set the game data for "My Game"
+          } else {
+            setHasGame(null); // No game associated with this user
+          }
+        }
+      }
+  
       if (
         currentJam &&
         user.jams.filter((jam: JamType) => jam.id == currentJam.id).length > 0
@@ -86,7 +120,7 @@ export default function PCNavbar() {
       } else {
         setIsInJam(false);
       }
-
+  
       if (response.status == 200) {
         setUser(user);
       } else {
@@ -94,6 +128,7 @@ export default function PCNavbar() {
       }
     }
   }, [pathname]);
+  
 
   return (
     <NavbarBase
@@ -126,15 +161,15 @@ export default function PCNavbar() {
         <NavbarLink href="/games" name="Games" />
       </NavbarContent>
 
-      {/* Right side navbar items */}
+      
       <NavbarContent justify="end" className="gap-4">
         <NavbarSearchbar />
         {user && <Divider orientation="vertical" className="h-1/2" />}
         {user && jam && isInJam && (
           <NavbarButtonLink
             icon={<Gamepad2 />}
-            name="Create Game"
-            href="/create-game"
+            name={hasGame ? "My Game" : "Create Game"}
+            href={hasGame ? "/games/"+hasGame.slug : "/create-game"}
           />
         )}
         {user && jam && !isInJam && (

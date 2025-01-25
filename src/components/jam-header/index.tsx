@@ -14,9 +14,9 @@ export default function JamHeader() {
     const fetchData = async () => {
       const jamData = await getCurrentJam();
       setActiveJamResponse(jamData);
-
+      console.log(jamData);
       // If we're in Jamming phase, fetch top themes and pick the first one
-      if (jamData?.phase === "Jamming" && jamData.jam) {
+      if ((jamData?.phase === "Jamming" || jamData?.phase === "Rating") && jamData.jam) {
         try {
           const response = await fetch(
             process.env.NEXT_PUBLIC_MODE === "PROD"

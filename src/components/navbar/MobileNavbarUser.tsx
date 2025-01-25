@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Avatar,
   Dropdown,
@@ -7,9 +9,9 @@ import {
   NavbarItem,
 } from "@nextui-org/react";
 import { UserType } from "@/types/UserType";
-import { getCurrentJam, joinJam } from "@/helpers/jam";
 import { JamType } from "@/types/JamType";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { getCurrentJam, joinJam } from "@/helpers/jam";
 import { toast } from "react-toastify";
 
 interface NavbarUserProps {
@@ -19,12 +21,27 @@ interface NavbarUserProps {
   isInJam?: boolean;
 }
 
-export default async function MobileNavbarUser({
+export default function MobileNavbarUser({
   user,
   jam,
   setIsInJam,
   isInJam,
 }: NavbarUserProps) {
+  const [currentJam, setCurrentJam] = useState<JamType | null>(null);
+
+  useEffect(() => {
+    const fetchCurrentJam = async () => {
+      try {
+        const response = await getCurrentJam();
+        setCurrentJam(response?.jam || null);
+      } catch (error) {
+        console.error("Error fetching current jam:", error);
+      }
+    };
+
+    fetchCurrentJam();
+  }, []);
+
   return (
     <NavbarItem>
       <Dropdown>
@@ -38,7 +55,7 @@ export default async function MobileNavbarUser({
           />
         </DropdownTrigger>
         <DropdownMenu>
-          {jam && (await getCurrentJam())?.jam && isInJam ? (
+          {jam && currentJam && isInJam ? (
             <DropdownItem
               key="create-game"
               href="/create-game"
@@ -47,20 +64,18 @@ export default async function MobileNavbarUser({
               Create Game
             </DropdownItem>
           ) : null}
-          {jam && (await getCurrentJam())?.jam && !isInJam ? (
+          {jam && currentJam && !isInJam ? (
             <DropdownItem
               key="join-event"
               className="text-black"
               onPress={async () => {
                 try {
-                  const currentJam = await getCurrentJam();
-
-                  if (!currentJam || !currentJam.jam) {
+                  if (!currentJam) {
                     toast.error("There is no jam to join");
                     return;
                   }
 
-                  if (await joinJam(currentJam.jam.id)) {
+                  if (await joinJam(currentJam.id)) {
                     setIsInJam(true);
                   }
                 } catch (error) {

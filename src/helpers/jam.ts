@@ -25,10 +25,8 @@ export async function getCurrentJam(): Promise<ActiveJamResponse | null> {
         : "http://localhost:3005/api/v1/jams/active"
     );
 
-    // Parse JSON response
     const data = await response.json();
-
-    // Return the phase and jam details
+    
     return {
       phase: data.phase,
       jam: data.futureJam,

@@ -20,6 +20,7 @@ export default function ThemeSlaughter() {
     null
   );
   const [phaseLoading, setPhaseLoading] = useState(true);
+  const [themeLoading, setThemeLoading] = useState<{ [key: number]: boolean }>({});
 
   // Fetch token on the client side
   useEffect(() => {
@@ -108,8 +109,10 @@ export default function ThemeSlaughter() {
   // Handle voting
   const handleVote = async (voteType: string) => {
     if (!randomTheme) return;
-
-    setLoading(true);
+  
+    // Set loading for the current random theme
+    setThemeLoading((prev) => ({ ...prev, [randomTheme.id]: true }));
+  
     try {
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
@@ -128,7 +131,7 @@ export default function ThemeSlaughter() {
           }),
         }
       );
-
+  
       if (response.ok) {
         // Refresh data after voting
         fetchRandomTheme();
@@ -139,7 +142,8 @@ export default function ThemeSlaughter() {
     } catch (error) {
       console.error("Error submitting vote:", error);
     } finally {
-      setLoading(false);
+      // Remove loading state for the current random theme
+      setThemeLoading((prev) => ({ ...prev, [randomTheme.id]: false }));
     }
   };
 
@@ -229,68 +233,78 @@ export default function ThemeSlaughter() {
 
   return (
     <div className="flex h-screen">
-      {/* Left Side */}
-      <div className="w-1/2 p-6 bg-gray-100 dark:bg-gray-800 flex flex-col justify-start items-center">
-        {randomTheme ? (
-          <>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-              {randomTheme.suggestion}
-            </h2>
-            <div className="flex gap-4">
-              <button
-                onClick={() => handleVote("YES")}
-                className="px-6 py-3 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600"
-                disabled={loading}
-              >
-                YES
-              </button>
-              <button
-                onClick={() => handleVote("NO")}
-                className="px-6 py-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600"
-                disabled={loading}
-              >
-                NO
-              </button>
-              <button
-                onClick={() => handleVote("SKIP")}
-                className="px-6 py-3 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-600"
-                disabled={loading}
-              >
-                SKIP
-              </button>
-            </div>
-          </>
-        ) : (
-          <p className="text-gray-600 dark:text-gray-400">
-            No themes available.
-          </p>
-        )}
-      </div>
-
-      {/* Right Side */}
-      <div className="w-1/2 p-6 bg-white dark:bg-gray-900 overflow-y-auto">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
-          Your Votes
-        </h3>
-        <div className="grid grid-cols-4 gap-4">
-          {votedThemes.map((theme) => (
-            <div
-              key={theme.id}
-              onClick={() => handleResetVote(theme.id)}
-              className={`p-4 rounded-lg cursor-pointer ${
-                theme.slaughterScore > 0
-                  ? "bg-green-500 text-white"
-                  : theme.slaughterScore < 0
-                  ? "bg-red-500 text-white"
-                  : "bg-gray-300 text-black"
+  {/* Left Side */}
+    <div className="w-1/2 p-6 bg-gray-100 dark:bg-gray-800 flex flex-col justify-start items-center">
+      {randomTheme ? (
+        <>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+            {randomTheme.suggestion}
+          </h2>
+          <div className="flex gap-4">
+            <button
+              onClick={() => handleVote("YES")}
+              className={`px-6 py-3 font-bold rounded-lg ${
+                themeLoading[randomTheme?.id || -1]
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-green-500 text-white hover:bg-green-600"
               }`}
+              disabled={themeLoading[randomTheme?.id || -1]}
             >
-              {theme.suggestion}
-            </div>
-          ))}
-        </div>
+              YES
+            </button>
+            <button
+              onClick={() => handleVote("NO")}
+              className={`px-6 py-3 font-bold rounded-lg ${
+                themeLoading[randomTheme?.id || -1]
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-red-500 text-white hover:bg-red-600"
+              }`}
+              disabled={themeLoading[randomTheme?.id || -1]}
+            >
+              NO
+            </button>
+            <button
+              onClick={() => handleVote("SKIP")}
+              className={`px-6 py-3 font-bold rounded-lg ${
+                themeLoading[randomTheme?.id || -1]
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-gray-500 text-white hover:bg-gray-600"
+              }`}
+              disabled={themeLoading[randomTheme?.id || -1]}
+            >
+              SKIP
+            </button>
+          </div>
+        </>
+      ) : (
+        <p className="text-gray-600 dark:text-gray-400">No themes available.</p>
+      )}
+    </div>
+
+    {/* Right Side */}
+    <div className="w-1/2 p-6 bg-white dark:bg-gray-900 overflow-y-auto">
+      <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
+        Your Votes
+      </h3>
+      <div className="grid grid-cols-4 gap-4">
+        {votedThemes.map((theme) => (
+          <div
+            key={theme.id}
+            onClick={() => handleResetVote(theme.id)}
+            className={`p-4 rounded-lg cursor-pointer ${
+              theme.slaughterScore > 0
+                ? "bg-green-500 text-white"
+                : theme.slaughterScore < 0
+                ? "bg-red-500 text-white"
+                : "bg-gray-300 text-black"
+            }`}
+          >
+            {theme.suggestion}
+          </div>
+        ))}
       </div>
     </div>
+  </div>
   );
   return <></>;
 }

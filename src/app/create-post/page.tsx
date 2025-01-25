@@ -43,6 +43,7 @@ export default function CreatePostPage() {
   const { theme } = useTheme();
   const [user, setUser] = useState<UserType>();
   const [sticky, setSticky] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
@@ -107,6 +108,16 @@ export default function CreatePostPage() {
     };
     load();
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
 
   const styles: StylesConfig<
     {
@@ -307,10 +318,12 @@ export default function CreatePostPage() {
           </Button>
         </div>
       </Form>
-      <div className="flex flex-col gap-4 px-8 items-end">
+      {!isMobile && (
+        <div className="flex flex-col gap-4 px-8 items-end">
         <Timers />
         <Streams />
       </div>
+      )}
     </div>    
   );
 }

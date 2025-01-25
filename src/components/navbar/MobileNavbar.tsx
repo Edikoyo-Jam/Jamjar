@@ -17,57 +17,60 @@ import { getCurrentJam } from "@/helpers/jam";
 import { JamType } from "@/types/JamType";
 import { UserType } from "@/types/UserType";
 import MobileNavbarUser from "./MobileNavbarUser";
+import ThemeToggle from "../theme-toggle";
+
 
 export default function MobileNavbar() {
   const pathname = usePathname();
   const [jam, setJam] = useState<JamType | null>();
   const [isInJam, setIsInJam] = useState<boolean>();
+
   const [user, setUser] = useState<UserType>();
 
   useEffect(() => {
-    loadUser();
-    async function loadUser() {
-      const currentJamResponse = await getCurrentJam();
-      const currentJam = currentJamResponse?.jam;
-      setJam(currentJam);
-
-      if (!hasCookie("token")) {
-        setUser(undefined);
-        return;
-      }
-
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
-          : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
-        {
-          headers: { authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
+      loadUser();
+      async function loadUser() {
+        const jamResponse = await getCurrentJam();
+        const currentJam = jamResponse?.jam;
+        setJam(currentJam);
+    
+        if (!hasCookie("token")) {
+          setUser(undefined);
+          return;
         }
-      );
-
-      const user = await response.json();
-
-      if (
-        currentJam &&
-        user.jams.filter((jam: JamType) => jam.id == currentJam.id).length > 0
-      ) {
-        setIsInJam(true);
-      } else {
-        setIsInJam(false);
+    
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_MODE === "PROD"
+            ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
+            : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
+          {
+            headers: { authorization: `Bearer ${getCookie("token")}` },
+            credentials: "include",
+          }
+        );
+    
+        const user = await response.json();
+    
+    
+        if (
+          currentJam &&
+          user.jams.filter((jam: JamType) => jam.id == currentJam.id).length > 0
+        ) {
+          setIsInJam(true);
+        } else {
+          setIsInJam(false);
+        }
+    
+        if (response.status == 200) {
+          setUser(user);
+        } else {
+          setUser(undefined);
+        }
       }
-
-      if (response.status == 200) {
-        setUser(user);
-      } else {
-        setUser(undefined);
-      }
-    }
-  }, [pathname]);
+    }, [pathname]);
 
   return (
     <NavbarBase maxWidth="2xl" className="bg-[#222] p-1" isBordered height={80}>
-      {/* Left side navbar items */}
       <NavbarContent justify="start" className="gap-10">
         <NavbarBrand className="flex-grow-0">
           <Link
@@ -85,9 +88,9 @@ export default function MobileNavbar() {
           </Link>
         </NavbarBrand>
       </NavbarContent>
-
-      {/* Right side navbar items */}
+      
       <NavbarContent justify="end" className="gap-4">
+      <ThemeToggle />
         {!user && (
           <NavbarButtonLink icon={<LogInIcon />} name="Log In" href="/login" />
         )}

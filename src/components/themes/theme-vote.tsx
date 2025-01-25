@@ -96,7 +96,12 @@ export default function VotingPage() {
 
   // Handle voting
   const handleVote = async (themeId: number, votingScore: number) => {
-    setLoading(true);
+    setThemes((prevThemes) =>
+      prevThemes.map((theme) =>
+        theme.id === themeId ? { ...theme, loading: true } : theme
+      )
+    );
+  
     try {
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
@@ -112,21 +117,30 @@ export default function VotingPage() {
           body: JSON.stringify({ suggestionId: themeId, votingScore }),
         }
       );
-
+  
       if (response.ok) {
-        // Just update the local state instead of re-fetching all themes
         setThemes((prevThemes) =>
           prevThemes.map((theme) =>
-            theme.id === themeId ? { ...theme, votingScore } : theme
+            theme.id === themeId
+              ? { ...theme, votingScore, loading: false }
+              : theme
           )
         );
       } else {
         console.error("Failed to submit vote.");
+        setThemes((prevThemes) =>
+          prevThemes.map((theme) =>
+            theme.id === themeId ? { ...theme, loading: false } : theme
+          )
+        );
       }
     } catch (error) {
       console.error("Error submitting vote:", error);
-    } finally {
-      setLoading(false);
+      setThemes((prevThemes) =>
+        prevThemes.map((theme) =>
+          theme.id === themeId ? { ...theme, loading: false } : theme
+        )
+      );
     }
   };
 
