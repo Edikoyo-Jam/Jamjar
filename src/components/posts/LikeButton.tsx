@@ -43,8 +43,8 @@ export default function LikeButton({ post }: { post: PostType }) {
           : "",
       }}
       onPress={async () => {
-        if (loading || liked) {
-          return;
+        if (!getCookie("token")) {
+          redirect("/login");
         }
 
         setLoading(true);
@@ -66,49 +66,49 @@ export default function LikeButton({ post }: { post: PostType }) {
           }
         );
 
+        post.hasLiked = !post.hasLiked;
+
+        if (post.hasLiked) {
+          setLiked(true);
+          setTimeout(() => setLiked(false), 1000);
+          setLikes(likes + 1);
+        } else {
+          setLiked(false);
+          setLikes(likes - 1);
+        }
+
         if (!response.ok) {
           setLoading(false);
           if (response.status == 401) {
             redirect("/login");
           } else {
+            post.hasLiked = !post.hasLiked;
             toast.error("An error occurred");
             return;
           }
         } else {
-          const data = await response.json();
-          setLikes(parseInt(data.likes));
-          post.hasLiked = data.action === "like";
           setLoading(false);
-          setLiked(data.action === "like");
-          setTimeout(() => setLiked(false), 1000);
         }
       }}
     >
-      {loading ? (
-        <LoaderCircle className="animate-spin" size={16} />
-      ) : (
-        <div
-          className="flex gap-2 items-center"
-          style={{ position: "relative" }}
-        >
-          <Heart size={16} />
-          <Heart
-            size={16}
-            className={
-              liked && !reduceMotion
-                ? "animate-ping absolute top-0 left-0"
-                : "absolute top-0 left-0"
-            }
-            style={{
-              position: "absolute",
-              top: "0",
-              left: "0",
-              zIndex: "10",
-            }}
-          />
-          <p>{likes}</p>
-        </div>
-      )}
+      <div className="flex gap-2 items-center" style={{ position: "relative" }}>
+        <Heart size={16} />
+        <Heart
+          size={16}
+          className={
+            liked && !reduceMotion
+              ? "animate-ping absolute top-0 left-0"
+              : "absolute top-0 left-0"
+          }
+          style={{
+            position: "absolute",
+            top: "0",
+            left: "0",
+            zIndex: "10",
+          }}
+        />
+        <p>{likes}</p>
+      </div>
     </Button>
   );
 }
