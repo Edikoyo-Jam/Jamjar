@@ -2,7 +2,7 @@
 
 import { Button } from "@nextui-org/react";
 import { PostType } from "@/types/PostType";
-import { Heart, LoaderCircle } from "lucide-react";
+import { Heart } from "lucide-react";
 import { toast } from "react-toastify";
 import { getCookie } from "@/helpers/cookie";
 import { redirect } from "next/navigation";
@@ -11,7 +11,6 @@ import { useTheme } from "next-themes";
 
 export default function LikeButton({ post }: { post: PostType }) {
   const [likes, setLikes] = useState<number>(post.likes.length);
-  const [loading, setLoading] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
   const { theme } = useTheme();
   const [reduceMotion, setReduceMotion] = useState<boolean>(false);
@@ -47,7 +46,6 @@ export default function LikeButton({ post }: { post: PostType }) {
           redirect("/login");
         }
 
-        setLoading(true);
         const response = await fetch(
           process.env.NEXT_PUBLIC_MODE === "PROD"
             ? "https://d2jam.com/api/v1/like"
@@ -78,7 +76,6 @@ export default function LikeButton({ post }: { post: PostType }) {
         }
 
         if (!response.ok) {
-          setLoading(false);
           if (response.status == 401) {
             redirect("/login");
           } else {
@@ -86,8 +83,6 @@ export default function LikeButton({ post }: { post: PostType }) {
             toast.error("An error occurred");
             return;
           }
-        } else {
-          setLoading(false);
         }
       }}
     >
