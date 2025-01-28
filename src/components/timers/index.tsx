@@ -23,19 +23,23 @@ export default function Timers() {
     fetchCurrentJamPhase();
   }, []);
 
-  
-
-  if(activeJamResponse && activeJamResponse.jam)
-  {
-    const startTimeUTC = new Date(activeJamResponse.jam.startTime).toISOString();
+  if (activeJamResponse && activeJamResponse.jam) {
+    const startTimeUTC = new Date(
+      activeJamResponse.jam.startTime
+    ).toISOString();
     console.log(startTimeUTC);
 
-    if (activeJamResponse.phase == "Suggestion" || activeJamResponse.phase == "Survival" || activeJamResponse.phase == "Voting") {
+    if (
+      activeJamResponse.phase == "Suggestion" ||
+      activeJamResponse.phase == "Survival" ||
+      activeJamResponse.phase == "Voting" ||
+      activeJamResponse.phase == "Upcoming Jam"
+    ) {
       return (
         <div className="text-[#333] dark:text-white transition-color duration-250">
           <Timer
             name="Jam starts in"
-            targetDate={new Date(activeJamResponse.jam.startTime) }
+            targetDate={new Date(activeJamResponse.jam.startTime)}
           />
           <Spacer y={8} />
           <p>Site under construction</p>
@@ -46,7 +50,12 @@ export default function Timers() {
         <div className="text-[#333] dark:text-white transition-color duration-250">
           <Timer
             name="Jam ends in"
-            targetDate={ new Date(new Date(activeJamResponse.jam.startTime).getTime() + (activeJamResponse.jam.jammingHours * 60 * 60 * 1000))}
+            targetDate={
+              new Date(
+                new Date(activeJamResponse.jam.startTime).getTime() +
+                  activeJamResponse.jam.jammingHours * 60 * 60 * 1000
+              )
+            }
           />
           <Spacer y={8} />
           <p>Site under construction</p>
@@ -57,7 +66,13 @@ export default function Timers() {
         <div className="text-[#333] dark:text-white transition-color duration-250">
           <Timer
             name="Rating ends in"
-            targetDate={new Date(new Date(activeJamResponse.jam.startTime).getTime() + (activeJamResponse.jam.jammingHours * 60 * 60 * 1000) + (activeJamResponse.jam.ratingHours * 60 * 60 * 1000))}
+            targetDate={
+              new Date(
+                new Date(activeJamResponse.jam.startTime).getTime() +
+                  activeJamResponse.jam.jammingHours * 60 * 60 * 1000 +
+                  activeJamResponse.jam.ratingHours * 60 * 60 * 1000
+              )
+            }
           />
           <Spacer y={8} />
           <p>Site under construction</p>
@@ -73,5 +88,4 @@ export default function Timers() {
       );
     }
   }
-  
 }
