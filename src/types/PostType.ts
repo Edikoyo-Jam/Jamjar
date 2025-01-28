@@ -1,3 +1,4 @@
+import { CommentType } from "./CommentType";
 import { TagType } from "./TagType";
 import { UserType } from "./UserType";
 
@@ -9,6 +10,7 @@ export interface PostType {
   content: string;
   author: UserType;
   createdAt: Date;
+  comments: CommentType[];
   tags: TagType[];
   likes: [];
   hasLiked: boolean;

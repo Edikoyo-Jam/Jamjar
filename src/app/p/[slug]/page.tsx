@@ -1,7 +1,7 @@
 "use client";
 
 import LikeButton from "@/components/posts/LikeButton";
-import { getCookie } from "@/helpers/cookie";
+import { getCookie, hasCookie } from "@/helpers/cookie";
 import { PostType } from "@/types/PostType";
 import { TagType } from "@/types/TagType";
 import { UserType } from "@/types/UserType";
@@ -36,6 +36,9 @@ import {
 import { redirect, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Editor from "@/components/editor";
+import sanitizeHtml from "sanitize-html";
+import CommentCard from "@/components/posts/CommentCard";
 
 export default function PostPage() {
   const [post, setPost] = useState<PostType>();
@@ -43,6 +46,8 @@ export default function PostPage() {
   const [reduceMotion, setReduceMotion] = useState<boolean>(false);
   const [user, setUser] = useState<UserType>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [content, setContent] = useState("");
+  const [waitingPost, setWaitingPost] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -110,210 +115,136 @@ export default function PostPage() {
           />
         </div>
       ) : (
-        <Card className="bg-opacity-60 !duration-250 !ease-linear !transition-all">
-          <CardBody className="p-5">
-            <div>
-              {post && (
-                <div>
-                  <Link href={`/p/${post.slug}`}>
-                    <p className="text-2xl">{post.title}</p>
-                  </Link>
-
-                  <div className="flex items-center gap-3 text-xs text-default-500 pt-1">
-                    <p>By</p>
-                    <Link
-                      href={`/u/${post.author.slug}`}
-                      className="flex items-center gap-2"
-                    >
-                      <Avatar
-                        size="sm"
-                        className="w-6 h-6"
-                        src={post.author.profilePicture}
-                        classNames={{
-                          base: "bg-transparent",
-                        }}
-                      />
-                      <p>{post.author.name}</p>
+        <>
+          <Card className="bg-opacity-60 !duration-250 !ease-linear !transition-all">
+            <CardBody className="p-5">
+              <div>
+                {post && (
+                  <div>
+                    <Link href={`/p/${post.slug}`}>
+                      <p className="text-2xl">{post.title}</p>
                     </Link>
-                    <p>
-                      {formatDistance(new Date(post.createdAt), new Date(), {
-                        addSuffix: true,
-                      })}
-                    </p>
-                  </div>
 
-                  <Spacer y={4} />
-
-                  <div
-                    className="prose dark:prose-invert !duration-250 !ease-linear !transition-all"
-                    dangerouslySetInnerHTML={{ __html: post.content }}
-                  />
-
-                  <Spacer y={4} />
-
-                  {post.tags.filter((tag) => tag.name != "D2Jam").length > 0 ? (
-                    <div className="flex gap-1">
-                      {post.tags
-                        .filter((tag) => tag.name != "D2Jam")
-                        .map((tag: TagType) => (
-                          <Link
-                            href="/"
-                            key={tag.id}
-                            className={`transition-all transform duration-500 ease-in-out ${
-                              !reduceMotion ? "hover:scale-110" : ""
-                            }`}
-                          >
-                            <Chip
-                              radius="sm"
-                              size="sm"
-                              className="!duration-250 !ease-linear !transition-all"
-                              variant="faded"
-                              avatar={
-                                tag.icon && (
-                                  <Avatar
-                                    src={tag.icon}
-                                    classNames={{ base: "bg-transparent" }}
-                                  />
-                                )
-                              }
-                            >
-                              {tag.name}
-                            </Chip>
-                          </Link>
-                        ))}
+                    <div className="flex items-center gap-3 text-xs text-default-500 pt-1">
+                      <p>By</p>
+                      <Link
+                        href={`/u/${post.author.slug}`}
+                        className="flex items-center gap-2"
+                      >
+                        <Avatar
+                          size="sm"
+                          className="w-6 h-6"
+                          src={post.author.profilePicture}
+                          classNames={{
+                            base: "bg-transparent",
+                          }}
+                        />
+                        <p>{post.author.name}</p>
+                      </Link>
+                      <p>
+                        {formatDistance(new Date(post.createdAt), new Date(), {
+                          addSuffix: true,
+                        })}
+                      </p>
                     </div>
-                  ) : (
-                    <></>
-                  )}
 
-                  {post.tags.length > 0 && <Spacer y={4} />}
+                    <Spacer y={4} />
 
-                  <div className="flex gap-3">
-                    <LikeButton post={post} />
-                    <Button
-                      size="sm"
-                      variant="bordered"
-                      onPress={() => {
-                        toast.warning("Comment functionality coming soon");
-                      }}
-                    >
-                      <MessageCircle size={16} /> {0}
-                    </Button>
-                    <Dropdown backdrop="opaque">
-                      <DropdownTrigger>
-                        <Button size="sm" variant="bordered" isIconOnly>
-                          <MoreVertical size={16} />
+                    <div
+                      className="prose dark:prose-invert !duration-250 !ease-linear !transition-all"
+                      dangerouslySetInnerHTML={{ __html: post.content }}
+                    />
+
+                    <Spacer y={4} />
+
+                    {post.tags.filter((tag) => tag.name != "D2Jam").length >
+                    0 ? (
+                      <div className="flex gap-1">
+                        {post.tags
+                          .filter((tag) => tag.name != "D2Jam")
+                          .map((tag: TagType) => (
+                            <Link
+                              href="/"
+                              key={tag.id}
+                              className={`transition-all transform duration-500 ease-in-out ${
+                                !reduceMotion ? "hover:scale-110" : ""
+                              }`}
+                            >
+                              <Chip
+                                radius="sm"
+                                size="sm"
+                                className="!duration-250 !ease-linear !transition-all"
+                                variant="faded"
+                                avatar={
+                                  tag.icon && (
+                                    <Avatar
+                                      src={tag.icon}
+                                      classNames={{ base: "bg-transparent" }}
+                                    />
+                                  )
+                                }
+                              >
+                                {tag.name}
+                              </Chip>
+                            </Link>
+                          ))}
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+
+                    {post.tags.length > 0 && <Spacer y={4} />}
+
+                    <div className="flex gap-3">
+                      <LikeButton
+                        likes={post.likes.length}
+                        liked={post.hasLiked}
+                        parentId={post.id}
+                      />
+                      <Link href="#create-comment">
+                        <Button size="sm" variant="bordered">
+                          <MessageCircle size={16} /> {post.comments.length}
                         </Button>
-                      </DropdownTrigger>
-                      <DropdownMenu className="text-[#333] dark:text-white">
-                        <DropdownSection
-                          showDivider={user?.mod}
-                          title="Actions"
-                        >
-                          <DropdownItem
-                            key="report"
-                            startContent={<Flag />}
-                            description="Report this post to moderators to handle"
-                            onPress={() => {
-                              toast.warning("Report functionality coming soon");
-                            }}
+                      </Link>
+                      <Dropdown backdrop="opaque">
+                        <DropdownTrigger>
+                          <Button size="sm" variant="bordered" isIconOnly>
+                            <MoreVertical size={16} />
+                          </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu className="text-[#333] dark:text-white">
+                          <DropdownSection
+                            showDivider={user?.mod}
+                            title="Actions"
                           >
-                            Create Report
-                          </DropdownItem>
-                          {user?.slug == post.author.slug ? (
                             <DropdownItem
-                              key="delete"
-                              startContent={<Trash />}
-                              description="Delete your post"
-                              onPress={async () => {
-                                const response = await fetch(
-                                  process.env.NEXT_PUBLIC_MODE === "PROD"
-                                    ? "https://d2jam.com/api/v1/post"
-                                    : "http://localhost:3005/api/v1/post",
-                                  {
-                                    body: JSON.stringify({
-                                      postId: post.id,
-                                      username: getCookie("user"),
-                                    }),
-                                    method: "DELETE",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                      authorization: `Bearer ${getCookie(
-                                        "token"
-                                      )}`,
-                                    },
-                                    credentials: "include",
-                                  }
+                              key="report"
+                              startContent={<Flag />}
+                              description="Report this post to moderators to handle"
+                              onPress={() => {
+                                toast.warning(
+                                  "Report functionality coming soon"
                                 );
-
-                                if (response.ok) {
-                                  toast.success("Deleted post");
-                                  redirect("/");
-                                } else {
-                                  toast.error("Error while deleting post");
-                                }
                               }}
                             >
-                              Delete
+                              Create Report
                             </DropdownItem>
-                          ) : (
-                            <></>
-                          )}
-                        </DropdownSection>
-                        {user?.mod ? (
-                          <DropdownSection title="Mod Zone">
-                            <DropdownItem
-                              key="remove"
-                              startContent={<X />}
-                              description="Remove this post"
-                              onPress={async () => {
-                                const response = await fetch(
-                                  process.env.NEXT_PUBLIC_MODE === "PROD"
-                                    ? "https://d2jam.com/api/v1/post"
-                                    : "http://localhost:3005/api/v1/post",
-                                  {
-                                    body: JSON.stringify({
-                                      postId: post.id,
-                                      username: getCookie("user"),
-                                    }),
-                                    method: "DELETE",
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                      authorization: `Bearer ${getCookie(
-                                        "token"
-                                      )}`,
-                                    },
-                                    credentials: "include",
-                                  }
-                                );
-
-                                if (response.ok) {
-                                  toast.success("Removed post");
-                                  redirect("/");
-                                } else {
-                                  toast.error("Error while removing post");
-                                }
-                              }}
-                            >
-                              Remove
-                            </DropdownItem>
-                            {post.sticky ? (
+                            {user?.slug == post.author.slug ? (
                               <DropdownItem
-                                key="unsticky"
-                                startContent={<StarOff />}
-                                description="Unsticky post"
+                                key="delete"
+                                startContent={<Trash />}
+                                description="Delete your post"
                                 onPress={async () => {
                                   const response = await fetch(
                                     process.env.NEXT_PUBLIC_MODE === "PROD"
-                                      ? "https://d2jam.com/api/v1/post/sticky"
-                                      : "http://localhost:3005/api/v1/post/sticky",
+                                      ? "https://d2jam.com/api/v1/post"
+                                      : "http://localhost:3005/api/v1/post",
                                     {
                                       body: JSON.stringify({
                                         postId: post.id,
-                                        sticky: false,
                                         username: getCookie("user"),
                                       }),
-                                      method: "POST",
+                                      method: "DELETE",
                                       headers: {
                                         "Content-Type": "application/json",
                                         authorization: `Bearer ${getCookie(
@@ -325,234 +256,383 @@ export default function PostPage() {
                                   );
 
                                   if (response.ok) {
-                                    toast.success("Unsticked post");
+                                    toast.success("Deleted post");
                                     redirect("/");
                                   } else {
-                                    toast.error("Error while removing post");
+                                    toast.error("Error while deleting post");
                                   }
                                 }}
                               >
-                                Unsticky
-                              </DropdownItem>
-                            ) : (
-                              <DropdownItem
-                                key="sticky"
-                                startContent={<Star />}
-                                description="Sticky post"
-                                onPress={async () => {
-                                  const response = await fetch(
-                                    process.env.NEXT_PUBLIC_MODE === "PROD"
-                                      ? "https://d2jam.com/api/v1/post/sticky"
-                                      : "http://localhost:3005/api/v1/post/sticky",
-                                    {
-                                      body: JSON.stringify({
-                                        postId: post.id,
-                                        sticky: true,
-                                        username: getCookie("user"),
-                                      }),
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        authorization: `Bearer ${getCookie(
-                                          "token"
-                                        )}`,
-                                      },
-                                      credentials: "include",
-                                    }
-                                  );
-
-                                  if (response.ok) {
-                                    toast.success("Unsticked post");
-                                    redirect("/");
-                                  } else {
-                                    toast.error("Error while removing post");
-                                  }
-                                }}
-                              >
-                                Sticky
-                              </DropdownItem>
-                            )}
-                            {user?.admin && !post.author.mod ? (
-                              <DropdownItem
-                                key="promote-mod"
-                                startContent={<Shield />}
-                                description="Promote user to Mod"
-                                onPress={async () => {
-                                  const response = await fetch(
-                                    process.env.NEXT_PUBLIC_MODE === "PROD"
-                                      ? "https://d2jam.com/api/v1/mod"
-                                      : "http://localhost:3005/api/v1/mod",
-                                    {
-                                      body: JSON.stringify({
-                                        targetname: post.author.slug,
-                                        mod: true,
-                                        username: getCookie("user"),
-                                      }),
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        authorization: `Bearer ${getCookie(
-                                          "token"
-                                        )}`,
-                                      },
-                                      credentials: "include",
-                                    }
-                                  );
-
-                                  if (response.ok) {
-                                    toast.success("Promoted User to Mod");
-                                    window.location.reload();
-                                  } else {
-                                    toast.error(
-                                      "Error while promoting user to Mod"
-                                    );
-                                  }
-                                }}
-                              >
-                                Appoint as mod
-                              </DropdownItem>
-                            ) : (
-                              <></>
-                            )}
-                            {user?.admin &&
-                            post.author.mod &&
-                            !post.author.admin ? (
-                              <DropdownItem
-                                key="demote-mod"
-                                startContent={<ShieldX />}
-                                description="Demote user from Mod"
-                                onPress={async () => {
-                                  const response = await fetch(
-                                    process.env.NEXT_PUBLIC_MODE === "PROD"
-                                      ? "https://d2jam.com/api/v1/mod"
-                                      : "http://localhost:3005/api/v1/mod",
-                                    {
-                                      body: JSON.stringify({
-                                        targetname: post.author.slug,
-                                        username: getCookie("user"),
-                                      }),
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        authorization: `Bearer ${getCookie(
-                                          "token"
-                                        )}`,
-                                      },
-                                      credentials: "include",
-                                    }
-                                  );
-
-                                  if (response.ok) {
-                                    toast.success("Demoted User");
-                                    window.location.reload();
-                                  } else {
-                                    toast.error("Error while demoting user");
-                                  }
-                                }}
-                              >
-                                Remove as mod
-                              </DropdownItem>
-                            ) : (
-                              <></>
-                            )}
-                            {user?.admin && !post.author.admin ? (
-                              <DropdownItem
-                                key="promote-admin"
-                                startContent={<ShieldAlert />}
-                                description="Promote user to Admin"
-                                onPress={async () => {
-                                  const response = await fetch(
-                                    process.env.NEXT_PUBLIC_MODE === "PROD"
-                                      ? "https://d2jam.com/api/v1/mod"
-                                      : "http://localhost:3005/api/v1/mod",
-                                    {
-                                      body: JSON.stringify({
-                                        targetname: post.author.slug,
-                                        admin: true,
-                                        username: getCookie("user"),
-                                      }),
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        authorization: `Bearer ${getCookie(
-                                          "token"
-                                        )}`,
-                                      },
-                                      credentials: "include",
-                                    }
-                                  );
-
-                                  if (response.ok) {
-                                    toast.success("Promoted User to Admin");
-                                    window.location.reload();
-                                  } else {
-                                    toast.error(
-                                      "Error while promoting user to Admin"
-                                    );
-                                  }
-                                }}
-                              >
-                                Appoint as admin
-                              </DropdownItem>
-                            ) : (
-                              <></>
-                            )}
-                            {user?.admin &&
-                            post.author.admin &&
-                            post.author.id !== user.id ? (
-                              <DropdownItem
-                                key="demote-admin"
-                                startContent={<ShieldX />}
-                                description="Demote user to mod"
-                                onPress={async () => {
-                                  const response = await fetch(
-                                    process.env.NEXT_PUBLIC_MODE === "PROD"
-                                      ? "https://d2jam.com/api/v1/mod"
-                                      : "http://localhost:3005/api/v1/mod",
-                                    {
-                                      body: JSON.stringify({
-                                        targetname: post.author.slug,
-                                        mod: true,
-                                        username: getCookie("user"),
-                                      }),
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        authorization: `Bearer ${getCookie(
-                                          "token"
-                                        )}`,
-                                      },
-                                      credentials: "include",
-                                    }
-                                  );
-
-                                  if (response.ok) {
-                                    toast.success("Demoted User to Mod");
-                                    window.location.reload();
-                                  } else {
-                                    toast.error(
-                                      "Error while demoting user to mod"
-                                    );
-                                  }
-                                }}
-                              >
-                                Remove as admin
+                                Delete
                               </DropdownItem>
                             ) : (
                               <></>
                             )}
                           </DropdownSection>
-                        ) : (
-                          <></>
-                        )}
-                      </DropdownMenu>
-                    </Dropdown>
+                          {user?.mod ? (
+                            <DropdownSection title="Mod Zone">
+                              <DropdownItem
+                                key="remove"
+                                startContent={<X />}
+                                description="Remove this post"
+                                onPress={async () => {
+                                  const response = await fetch(
+                                    process.env.NEXT_PUBLIC_MODE === "PROD"
+                                      ? "https://d2jam.com/api/v1/post"
+                                      : "http://localhost:3005/api/v1/post",
+                                    {
+                                      body: JSON.stringify({
+                                        postId: post.id,
+                                        username: getCookie("user"),
+                                      }),
+                                      method: "DELETE",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                        authorization: `Bearer ${getCookie(
+                                          "token"
+                                        )}`,
+                                      },
+                                      credentials: "include",
+                                    }
+                                  );
+
+                                  if (response.ok) {
+                                    toast.success("Removed post");
+                                    redirect("/");
+                                  } else {
+                                    toast.error("Error while removing post");
+                                  }
+                                }}
+                              >
+                                Remove
+                              </DropdownItem>
+                              {post.sticky ? (
+                                <DropdownItem
+                                  key="unsticky"
+                                  startContent={<StarOff />}
+                                  description="Unsticky post"
+                                  onPress={async () => {
+                                    const response = await fetch(
+                                      process.env.NEXT_PUBLIC_MODE === "PROD"
+                                        ? "https://d2jam.com/api/v1/post/sticky"
+                                        : "http://localhost:3005/api/v1/post/sticky",
+                                      {
+                                        body: JSON.stringify({
+                                          postId: post.id,
+                                          sticky: false,
+                                          username: getCookie("user"),
+                                        }),
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          authorization: `Bearer ${getCookie(
+                                            "token"
+                                          )}`,
+                                        },
+                                        credentials: "include",
+                                      }
+                                    );
+
+                                    if (response.ok) {
+                                      toast.success("Unsticked post");
+                                      redirect("/");
+                                    } else {
+                                      toast.error("Error while removing post");
+                                    }
+                                  }}
+                                >
+                                  Unsticky
+                                </DropdownItem>
+                              ) : (
+                                <DropdownItem
+                                  key="sticky"
+                                  startContent={<Star />}
+                                  description="Sticky post"
+                                  onPress={async () => {
+                                    const response = await fetch(
+                                      process.env.NEXT_PUBLIC_MODE === "PROD"
+                                        ? "https://d2jam.com/api/v1/post/sticky"
+                                        : "http://localhost:3005/api/v1/post/sticky",
+                                      {
+                                        body: JSON.stringify({
+                                          postId: post.id,
+                                          sticky: true,
+                                          username: getCookie("user"),
+                                        }),
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          authorization: `Bearer ${getCookie(
+                                            "token"
+                                          )}`,
+                                        },
+                                        credentials: "include",
+                                      }
+                                    );
+
+                                    if (response.ok) {
+                                      toast.success("Unsticked post");
+                                      redirect("/");
+                                    } else {
+                                      toast.error("Error while removing post");
+                                    }
+                                  }}
+                                >
+                                  Sticky
+                                </DropdownItem>
+                              )}
+                              {user?.admin && !post.author.mod ? (
+                                <DropdownItem
+                                  key="promote-mod"
+                                  startContent={<Shield />}
+                                  description="Promote user to Mod"
+                                  onPress={async () => {
+                                    const response = await fetch(
+                                      process.env.NEXT_PUBLIC_MODE === "PROD"
+                                        ? "https://d2jam.com/api/v1/mod"
+                                        : "http://localhost:3005/api/v1/mod",
+                                      {
+                                        body: JSON.stringify({
+                                          targetname: post.author.slug,
+                                          mod: true,
+                                          username: getCookie("user"),
+                                        }),
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          authorization: `Bearer ${getCookie(
+                                            "token"
+                                          )}`,
+                                        },
+                                        credentials: "include",
+                                      }
+                                    );
+
+                                    if (response.ok) {
+                                      toast.success("Promoted User to Mod");
+                                      window.location.reload();
+                                    } else {
+                                      toast.error(
+                                        "Error while promoting user to Mod"
+                                      );
+                                    }
+                                  }}
+                                >
+                                  Appoint as mod
+                                </DropdownItem>
+                              ) : (
+                                <></>
+                              )}
+                              {user?.admin &&
+                              post.author.mod &&
+                              !post.author.admin ? (
+                                <DropdownItem
+                                  key="demote-mod"
+                                  startContent={<ShieldX />}
+                                  description="Demote user from Mod"
+                                  onPress={async () => {
+                                    const response = await fetch(
+                                      process.env.NEXT_PUBLIC_MODE === "PROD"
+                                        ? "https://d2jam.com/api/v1/mod"
+                                        : "http://localhost:3005/api/v1/mod",
+                                      {
+                                        body: JSON.stringify({
+                                          targetname: post.author.slug,
+                                          username: getCookie("user"),
+                                        }),
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          authorization: `Bearer ${getCookie(
+                                            "token"
+                                          )}`,
+                                        },
+                                        credentials: "include",
+                                      }
+                                    );
+
+                                    if (response.ok) {
+                                      toast.success("Demoted User");
+                                      window.location.reload();
+                                    } else {
+                                      toast.error("Error while demoting user");
+                                    }
+                                  }}
+                                >
+                                  Remove as mod
+                                </DropdownItem>
+                              ) : (
+                                <></>
+                              )}
+                              {user?.admin && !post.author.admin ? (
+                                <DropdownItem
+                                  key="promote-admin"
+                                  startContent={<ShieldAlert />}
+                                  description="Promote user to Admin"
+                                  onPress={async () => {
+                                    const response = await fetch(
+                                      process.env.NEXT_PUBLIC_MODE === "PROD"
+                                        ? "https://d2jam.com/api/v1/mod"
+                                        : "http://localhost:3005/api/v1/mod",
+                                      {
+                                        body: JSON.stringify({
+                                          targetname: post.author.slug,
+                                          admin: true,
+                                          username: getCookie("user"),
+                                        }),
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          authorization: `Bearer ${getCookie(
+                                            "token"
+                                          )}`,
+                                        },
+                                        credentials: "include",
+                                      }
+                                    );
+
+                                    if (response.ok) {
+                                      toast.success("Promoted User to Admin");
+                                      window.location.reload();
+                                    } else {
+                                      toast.error(
+                                        "Error while promoting user to Admin"
+                                      );
+                                    }
+                                  }}
+                                >
+                                  Appoint as admin
+                                </DropdownItem>
+                              ) : (
+                                <></>
+                              )}
+                              {user?.admin &&
+                              post.author.admin &&
+                              post.author.id !== user.id ? (
+                                <DropdownItem
+                                  key="demote-admin"
+                                  startContent={<ShieldX />}
+                                  description="Demote user to mod"
+                                  onPress={async () => {
+                                    const response = await fetch(
+                                      process.env.NEXT_PUBLIC_MODE === "PROD"
+                                        ? "https://d2jam.com/api/v1/mod"
+                                        : "http://localhost:3005/api/v1/mod",
+                                      {
+                                        body: JSON.stringify({
+                                          targetname: post.author.slug,
+                                          mod: true,
+                                          username: getCookie("user"),
+                                        }),
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          authorization: `Bearer ${getCookie(
+                                            "token"
+                                          )}`,
+                                        },
+                                        credentials: "include",
+                                      }
+                                    );
+
+                                    if (response.ok) {
+                                      toast.success("Demoted User to Mod");
+                                      window.location.reload();
+                                    } else {
+                                      toast.error(
+                                        "Error while demoting user to mod"
+                                      );
+                                    }
+                                  }}
+                                >
+                                  Remove as admin
+                                </DropdownItem>
+                              ) : (
+                                <></>
+                              )}
+                            </DropdownSection>
+                          ) : (
+                            <></>
+                          )}
+                        </DropdownMenu>
+                      </Dropdown>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          </CardBody>
-        </Card>
+                )}
+              </div>
+            </CardBody>
+          </Card>
+          <div id="create-comment" />
+          <Spacer y={10} />
+          <Editor content={content} setContent={setContent} />
+          <Spacer />
+          <Button
+            color="primary"
+            onPress={async () => {
+              if (!content) {
+                toast.error("Please enter valid content");
+                return;
+              }
+
+              if (!hasCookie("token")) {
+                toast.error("You are not logged in");
+                return;
+              }
+
+              const sanitizedHtml = sanitizeHtml(content);
+              setWaitingPost(true);
+
+              const response = await fetch(
+                process.env.NEXT_PUBLIC_MODE === "PROD"
+                  ? "https://d2jam.com/api/v1/comment"
+                  : "http://localhost:3005/api/v1/comment",
+                {
+                  body: JSON.stringify({
+                    content: sanitizedHtml,
+                    username: getCookie("user"),
+                    postId: post?.id,
+                  }),
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    authorization: `Bearer ${getCookie("token")}`,
+                  },
+                  credentials: "include",
+                }
+              );
+
+              if (response.status == 401) {
+                toast.error("Invalid User");
+                setWaitingPost(false);
+                return;
+              }
+
+              if (response.ok) {
+                toast.success("Successfully created comment");
+                setWaitingPost(false);
+                window.location.reload();
+              } else {
+                toast.error("An error occured");
+                setWaitingPost(false);
+              }
+            }}
+          >
+            {waitingPost ? (
+              <LoaderCircle className="animate-spin" size={16} />
+            ) : (
+              <p>Create Comment</p>
+            )}
+          </Button>
+          <Spacer y={10} />
+
+          <div className="flex flex-col gap-3">
+            {post?.comments.map((comment) => (
+              <div key={comment.id}>
+                <CommentCard comment={comment} />
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </>
   );

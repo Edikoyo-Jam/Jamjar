@@ -197,16 +197,16 @@ export default function PostCard({
               {post.tags.length > 0 && <Spacer y={4} />}
 
               <div className="flex gap-3">
-                <LikeButton post={post} />
-                <Button
-                  size="sm"
-                  variant="bordered"
-                  onPress={() => {
-                    toast.warning("Comment functionality coming soon");
-                  }}
-                >
-                  <MessageCircle size={16} /> {0}
-                </Button>
+                <LikeButton
+                  likes={post.likes.length}
+                  liked={post.hasLiked}
+                  parentId={post.id}
+                />
+                <Link href={`/p/${post.slug}#create-comment`}>
+                  <Button size="sm" variant="bordered">
+                    <MessageCircle size={16} /> {post.comments.length}
+                  </Button>
+                </Link>
                 <Dropdown backdrop="opaque">
                   <DropdownTrigger>
                     <Button size="sm" variant="bordered" isIconOnly>

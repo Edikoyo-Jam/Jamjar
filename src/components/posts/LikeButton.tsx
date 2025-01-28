@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@nextui-org/react";
-import { PostType } from "@/types/PostType";
 import { Heart } from "lucide-react";
 import { toast } from "react-toastify";
 import { getCookie } from "@/helpers/cookie";
@@ -9,11 +8,22 @@ import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 
-export default function LikeButton({ post }: { post: PostType }) {
-  const [likes, setLikes] = useState<number>(post.likes.length);
-  const [liked, setLiked] = useState<boolean>(false);
+export default function LikeButton({
+  likes,
+  liked,
+  parentId,
+  isComment = false,
+}: {
+  likes: number;
+  liked: boolean;
+  parentId: number;
+  isComment?: boolean;
+}) {
   const { theme } = useTheme();
   const [reduceMotion, setReduceMotion] = useState<boolean>(false);
+  const [likeEffect, setLikeEffect] = useState<boolean>(false);
+  const [updatedLikes, setUpdatedLikes] = useState<number>(likes);
+  const [updatedLiked, setUpdatedLiked] = useState<boolean>(liked);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -34,8 +44,8 @@ export default function LikeButton({ post }: { post: PostType }) {
       size="sm"
       variant="bordered"
       style={{
-        color: post.hasLiked ? (theme == "dark" ? "#5ed4f7" : "#05b7eb") : "",
-        borderColor: post.hasLiked
+        color: updatedLiked ? (theme == "dark" ? "#5ed4f7" : "#05b7eb") : "",
+        borderColor: updatedLiked
           ? theme == "dark"
             ? "#5ed4f744"
             : "#05b7eb44"
@@ -59,27 +69,28 @@ export default function LikeButton({ post }: { post: PostType }) {
             credentials: "include",
             body: JSON.stringify({
               username: getCookie("user"),
-              postId: post.id,
+              postId: !isComment ? parentId : 0,
+              commentId: isComment ? parentId : 0,
             }),
           }
         );
 
-        post.hasLiked = !post.hasLiked;
-
-        if (post.hasLiked) {
-          setLiked(true);
-          setTimeout(() => setLiked(false), 1000);
-          setLikes(likes + 1);
+        if (!updatedLiked) {
+          setLikeEffect(true);
+          setTimeout(() => setLikeEffect(false), 1000);
+          setUpdatedLikes(updatedLikes + 1);
         } else {
-          setLiked(false);
-          setLikes(likes - 1);
+          setLikeEffect(false);
+          setUpdatedLikes(updatedLikes - 1);
         }
+
+        setUpdatedLiked(!updatedLiked);
 
         if (!response.ok) {
           if (response.status == 401) {
             redirect("/login");
           } else {
-            post.hasLiked = !post.hasLiked;
+            setUpdatedLiked(!updatedLiked);
             toast.error("An error occurred");
             return;
           }
@@ -91,7 +102,7 @@ export default function LikeButton({ post }: { post: PostType }) {
         <Heart
           size={16}
           className={
-            liked && !reduceMotion
+            likeEffect && !reduceMotion
               ? "animate-ping absolute top-0 left-0"
               : "absolute top-0 left-0"
           }
@@ -102,7 +113,7 @@ export default function LikeButton({ post }: { post: PostType }) {
             zIndex: "10",
           }}
         />
-        <p>{likes}</p>
+        <p>{updatedLikes}</p>
       </div>
     </Button>
   );
