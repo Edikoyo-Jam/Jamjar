@@ -181,14 +181,14 @@ export default function Posts() {
             ? `https://d2jam.com/api/v1/posts?sort=${sort}&time=${time}&tags=${
                 tagRules
                   ? Object.entries(tagRules)
-                      .map((key, value) => `${key}-${value}`)
+                      .map((key) => `${key}`)
                       .join("_")
                   : ""
               }`
             : `http://localhost:3005/api/v1/posts?sort=${sort}&time=${time}&tags=${
                 tagRules
                   ? Object.entries(tagRules)
-                      .map((key, value) => `${key}-${value}`)
+                      .map((key) => `${key}`)
                       .join("_")
                   : ""
               }`
@@ -201,14 +201,14 @@ export default function Posts() {
             ? `https://d2jam.com/api/v1/posts?sort=${sort}&time=${time}&tags=${
                 tagRules
                   ? Object.entries(tagRules)
-                      .map((key, value) => `${key}-${value}`)
+                      .map((key) => `${key}`)
                       .join("_")
                   : ""
               }&sticky=true`
             : `http://localhost:3005/api/v1/posts?sort=${sort}&time=${time}&tags=${
                 tagRules
                   ? Object.entries(tagRules)
-                      .map((key, value) => `${key}-${value}`)
+                      .map((key) => `${key}`)
                       .join("_")
                   : ""
               }&sticky=true`
