@@ -4,11 +4,12 @@ import Editor from "@/components/editor";
 import sanitizeHtml from "sanitize-html";
 import { getCookie, hasCookie } from "@/helpers/cookie";
 import { UserType } from "@/types/UserType";
-import { Button, Form, Input } from "@nextui-org/react";
+import { Avatar, Button, Form, Input } from "@nextui-org/react";
 import { redirect, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { LoaderCircle } from "lucide-react";
+import Image from "next/image";
 
 export default function UserPage() {
   const [user, setUser] = useState<UserType>();
@@ -54,7 +55,7 @@ export default function UserPage() {
   }, [pathname]);
 
   return (
-    <div className="absolute flex items-center justify-center top-0 left-0 w-screen h-screen">
+    <div className="flex items-center justify-center">
       {!user ? (
         "Loading settings..."
       ) : (
@@ -134,6 +135,8 @@ export default function UserPage() {
             onValueChange={setProfilePicture}
           />
 
+          {profilePicture && <Avatar src={profilePicture} />}
+
           <Input
             label="Banner Picture"
             labelPlacement="outside"
@@ -143,6 +146,19 @@ export default function UserPage() {
             value={bannerPicture}
             onValueChange={setBannerPicture}
           />
+
+          {bannerPicture &&
+            bannerPicture.startsWith("https://") &&
+            bannerPicture.length > 8 && (
+              <div className="bg-[#222222] h-28 w-full relative">
+                <Image
+                  src={bannerPicture}
+                  alt={`${user.name}'s profile banner`}
+                  className="object-cover"
+                  fill
+                />
+              </div>
+            )}
 
           <div className="flex gap-2">
             <Button color="primary" type="submit">
