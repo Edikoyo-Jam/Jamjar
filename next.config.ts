@@ -5,10 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "static-cdn.jtvnw.net",
-        port: "",
-        pathname: "/**",
-        search: "",
+        hostname: "**",
       },
     ],
   },

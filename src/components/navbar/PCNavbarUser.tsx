@@ -3,6 +3,7 @@ import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
+  DropdownSection,
   DropdownTrigger,
   NavbarItem,
 } from "@nextui-org/react";
@@ -26,21 +27,23 @@ export default function PCNavbarUser({ user }: NavbarUserProps) {
           />
         </DropdownTrigger>
         <DropdownMenu>
-          <DropdownItem
-            key="profile"
-            className="text-[#333] dark:text-white"
-            href={`/u/${user.slug}`}
-          >
-            Profile
-          </DropdownItem>
-          <DropdownItem
-            showDivider
-            key="settings"
-            className="text-[#333] dark:text-white"
-            href="/settings"
-          >
-            Settings
-          </DropdownItem>
+          <DropdownSection title={user.name}>
+            <DropdownItem
+              key="profile"
+              className="text-[#333] dark:text-white"
+              href={`/u/${user.slug}`}
+            >
+              Profile
+            </DropdownItem>
+            <DropdownItem
+              showDivider
+              key="settings"
+              className="text-[#333] dark:text-white"
+              href="/settings"
+            >
+              Settings
+            </DropdownItem>
+          </DropdownSection>
           <DropdownItem
             key="logout"
             color="danger"
