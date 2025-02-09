@@ -17,7 +17,8 @@ export default function UserPage() {
           ? `https://d2jam.com/api/v1/user?targetUserSlug=${slug}`
           : `http://localhost:3005/api/v1/user?targetUserSlug=${slug}`
       );
-      setUser(await response.json());
+      const { data } = await response.json();
+      setUser(data);
     };
 
     fetchUser();
