@@ -33,6 +33,8 @@ import NavbarButtonAction from "./NavbarButtonAction";
 import { toast } from "react-toastify";
 import NavbarIconLink from "./NavbarIconLink";
 import ThemeToggle from "../theme-toggle";
+import IconLink from "../link-components/IconLink";
+import { SiBluesky, SiDiscord } from "@icons-pack/react-simple-icons";
 
 export default function PCNavbar() {
   const pathname = usePathname();
@@ -62,12 +64,12 @@ export default function PCNavbar() {
       const jamResponse = await getCurrentJam();
       const currentJam = jamResponse?.jam;
       setJam(currentJam);
-  
+
       if (!hasCookie("token")) {
         setUser(undefined);
         return;
       }
-  
+
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
           ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
@@ -77,33 +79,39 @@ export default function PCNavbar() {
           credentials: "include",
         }
       );
-  
+
       const user = await response.json();
-  
+
       // Check if user has a game in current jam
       const gameResponse = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self/current-game?username=${getCookie("user")}`
-          : `http://localhost:3005/api/v1/self/current-game?username=${getCookie("user")}`,
+          ? `https://d2jam.com/api/v1/self/current-game?username=${getCookie(
+              "user"
+            )}`
+          : `http://localhost:3005/api/v1/self/current-game?username=${getCookie(
+              "user"
+            )}`,
         {
           headers: { authorization: `Bearer ${getCookie("token")}` },
           credentials: "include",
         }
       );
-  
+
       if (gameResponse.ok) {
         const gameData = await gameResponse.json();
         console.log("Game Data:", gameData); // Log game data
         console.log("User Data:", user); // Log user data
-      
+
         if (gameData) {
           // Check if the logged-in user is either the creator or a contributor
           const isContributor =
             gameData.author?.id === user.id || // Check if logged-in user is the author
-            gameData.contributors?.some((contributor: UserType) => contributor.id === user.id); // Check if logged-in user is a contributor
-      
+            gameData.contributors?.some(
+              (contributor: UserType) => contributor.id === user.id
+            ); // Check if logged-in user is a contributor
+
           console.log("Is Contributor:", isContributor); // Log whether the user is a contributor
-      
+
           if (isContributor) {
             setHasGame(gameData); // Set the game data for "My Game"
           } else {
@@ -111,7 +119,7 @@ export default function PCNavbar() {
           }
         }
       }
-  
+
       if (
         currentJam &&
         user.jams.filter((jam: JamType) => jam.id == currentJam.id).length > 0
@@ -120,7 +128,7 @@ export default function PCNavbar() {
       } else {
         setIsInJam(false);
       }
-  
+
       if (response.status == 200) {
         setUser(user);
       } else {
@@ -128,7 +136,6 @@ export default function PCNavbar() {
       }
     }
   }, [pathname]);
-  
 
   return (
     <NavbarBase
@@ -161,7 +168,6 @@ export default function PCNavbar() {
         <NavbarLink href="/games" name="Games" />
       </NavbarContent>
 
-      
       <NavbarContent justify="end" className="gap-4">
         <NavbarSearchbar />
         {user && <Divider orientation="vertical" className="h-1/2" />}
@@ -169,7 +175,7 @@ export default function PCNavbar() {
           <NavbarButtonLink
             icon={<Gamepad2 />}
             name={hasGame ? "My Game" : "Create Game"}
-            href={hasGame ? "/games/"+hasGame.slug : "/create-game"}
+            href={hasGame ? "/games/" + hasGame.slug : "/create-game"}
           />
         )}
         {user && jam && !isInJam && (
@@ -201,6 +207,11 @@ export default function PCNavbar() {
         {user && user.mod && (
           <NavbarIconLink icon={<Shield />} href="/reports" />
         )}
+        <IconLink
+          icon={<SiBluesky />}
+          href="https://bsky.app/profile/d2jam.com"
+        />
+        <IconLink icon={<SiDiscord />} href="https://discord.d2jam.com" />
         <ThemeToggle />
         <Divider orientation="vertical" className="h-1/2" />
         {!user && (
