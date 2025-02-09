@@ -91,12 +91,14 @@ export default function UserPage() {
                   bio: sanitizedBio,
                   profilePicture: profilePicture,
                   bannerPicture: bannerPicture,
+                  targetUserSlug: user.slug,
                 }),
                 method: "PUT",
                 headers: {
                   "Content-Type": "application/json",
                   authorization: `Bearer ${getCookie("token")}`,
                 },
+                credentials: "include",
               }
             );
 

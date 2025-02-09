@@ -9,9 +9,9 @@ export default function UserPage() {
     async function logout() {
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/logout"
-          : "http://localhost:3005/api/v1/logout",
-        { method: "POST", credentials: "include" }
+          ? "https://d2jam.com/api/v1/session"
+          : "http://localhost:3005/api/v1/session",
+        { method: "DELETE", credentials: "include" }
       );
 
       if (response.ok) {

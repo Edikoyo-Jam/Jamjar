@@ -68,8 +68,8 @@ export default function UserPage() {
 
           const response = await fetch(
             process.env.NEXT_PUBLIC_MODE === "PROD"
-              ? "https://d2jam.com/api/v1/signup"
-              : "http://localhost:3005/api/v1/signup",
+              ? "https://d2jam.com/api/v1/user"
+              : "http://localhost:3005/api/v1/user",
             {
               body: JSON.stringify({ username: username, password: password }),
               method: "POST",

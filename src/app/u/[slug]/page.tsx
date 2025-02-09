@@ -14,8 +14,8 @@ export default function UserPage() {
     const fetchUser = async () => {
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/user?slug=${slug}`
-          : `http://localhost:3005/api/v1/user?slug=${slug}`
+          ? `https://d2jam.com/api/v1/user?targetUserSlug=${slug}`
+          : `http://localhost:3005/api/v1/user?targetUserSlug=${slug}`
       );
       setUser(await response.json());
     };
