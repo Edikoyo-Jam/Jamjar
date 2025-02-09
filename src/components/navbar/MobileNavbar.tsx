@@ -18,6 +18,7 @@ import { JamType } from "@/types/JamType";
 import { UserType } from "@/types/UserType";
 import MobileNavbarUser from "./MobileNavbarUser";
 import ThemeToggle from "../theme-toggle";
+import { getSelf } from "@/requests/user";
 
 
 export default function MobileNavbar() {
@@ -39,18 +40,8 @@ export default function MobileNavbar() {
           return;
         }
     
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
-            : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
-          {
-            headers: { authorization: `Bearer ${getCookie("token")}` },
-            credentials: "include",
-          }
-        );
-    
+        const response = await getSelf();
         const user = await response.json();
-    
     
         if (
           currentJam &&

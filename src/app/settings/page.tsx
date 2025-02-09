@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
+import { getSelf, updateUser } from "@/requests/user";
 
 export default function UserPage() {
   const [user, setUser] = useState<UserType>();
@@ -30,15 +31,7 @@ export default function UserPage() {
         return;
       }
 
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
-          : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
-        {
-          headers: { authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
-        }
-      );
+      const response = await getSelf();
 
       if (response.status == 200) {
         const data = await response.json();
@@ -80,25 +73,7 @@ export default function UserPage() {
 
             setWaitingSave(true);
 
-            const response = await fetch(
-              process.env.NEXT_PUBLIC_MODE === "PROD"
-                ? "https://d2jam.com/api/v1/user"
-                : "http://localhost:3005/api/v1/user",
-              {
-                body: JSON.stringify({
-                  slug: user.slug,
-                  name: name,
-                  bio: sanitizedBio,
-                  profilePicture: profilePicture,
-                  bannerPicture: bannerPicture,
-                }),
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                  authorization: `Bearer ${getCookie("token")}`,
-                },
-              }
-            );
+            const response = await updateUser(user.slug, name, sanitizedBio, profilePicture, bannerPicture); 
 
             if (response.ok) {
               toast.success("Changed settings");

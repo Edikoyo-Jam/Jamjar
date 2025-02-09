@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { FeaturedStreamerType } from "@/types/FeaturedStreamerType";
 import { Image } from "@nextui-org/react";
 import NextImage from "next/image";
+import { getStreamers } from "@/requests/streamer";
 
 export default function Streams() {
   const [streamers, setStreamers] = useState<FeaturedStreamerType[]>([]);
@@ -12,11 +13,7 @@ export default function Streams() {
   useEffect(() => {
     const fetchStreamers = async () => {
       try {
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? "https://d2jam.com/api/v1/streamers/get"
-            : "http://localhost:3005/api/v1/streamers/get"
-        );
+        const response = await getStreamers();
         if (!response.ok) {
           throw new Error("Failed to fetch featured streamers");
         }

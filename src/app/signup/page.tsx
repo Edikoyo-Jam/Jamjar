@@ -1,5 +1,6 @@
 "use client";
 
+import { signup } from "@/requests/auth";
 import { Button, Form, Input, Link } from "@nextui-org/react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
@@ -66,17 +67,7 @@ export default function UserPage() {
             return;
           }
 
-          const response = await fetch(
-            process.env.NEXT_PUBLIC_MODE === "PROD"
-              ? "https://d2jam.com/api/v1/signup"
-              : "http://localhost:3005/api/v1/signup",
-            {
-              body: JSON.stringify({ username: username, password: password }),
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-            }
-          );
+          const response = await signup(username, password);
 
           if (response.status == 409) {
             setErrors({ username: "User already exists" });

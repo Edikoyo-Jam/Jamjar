@@ -9,6 +9,7 @@ import {
 } from "@/helpers/jam";
 import { ThemeType } from "@/types/ThemeType";
 import { joinJam } from "@/helpers/jam";
+import { getThemeVotes, getTopThemes, postThemeSuggestionVote } from "@/requests/theme";
 
 interface VoteType {
   themeSuggestionId: number;
@@ -46,28 +47,12 @@ export default function VotingPage() {
       if (!token || !activeJamResponse) return;
 
       try {
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? "https://d2jam.com/api/v1/themes/top-themes"
-            : "http://localhost:3005/api/v1/themes/top-themes",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            credentials: "include",
-          }
-        );
+        const response = await getTopThemes();
         if (response.ok) {
           const themes = await response.json();
 
           // Fetch user's votes for these themes
-          const votesResponse = await fetch(
-            process.env.NEXT_PUBLIC_MODE === "PROD"
-              ? "https://d2jam.com/api/v1/themes/votes"
-              : "http://localhost:3005/api/v1/themes/votes",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-              credentials: "include",
-            }
-          );
+          const votesResponse = await getThemeVotes();
 
           if (votesResponse.ok) {
             const votes = await votesResponse.json();
@@ -103,20 +88,7 @@ export default function VotingPage() {
     );
   
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/themes/vote"
-          : "http://localhost:3005/api/v1/themes/vote",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: "include",
-          body: JSON.stringify({ suggestionId: themeId, votingScore }),
-        }
-      );
+      const response = await postThemeSuggestionVote(themeId, votingScore);
   
       if (response.ok) {
         setThemes((prevThemes) =>

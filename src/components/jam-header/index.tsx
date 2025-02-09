@@ -3,6 +3,7 @@
 import { Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getCurrentJam, ActiveJamResponse } from "../../helpers/jam";
+import { getTopThemes } from "@/requests/theme";
 
 export default function JamHeader() {
   const [activeJamResponse, setActiveJamResponse] =
@@ -18,11 +19,7 @@ export default function JamHeader() {
       // If we're in Jamming phase, fetch top themes and pick the first one
       if ((jamData?.phase === "Jamming" || jamData?.phase === "Rating") && jamData.jam) {
         try {
-          const response = await fetch(
-            process.env.NEXT_PUBLIC_MODE === "PROD"
-              ? "https://d2jam.com/api/v1/themes/top-themes"
-              : "http://localhost:3005/api/v1/themes/top-themes"
-          );
+          const response = await getTopThemes();
 
           if (response.ok) {
             const themes = await response.json();

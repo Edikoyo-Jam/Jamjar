@@ -1,5 +1,6 @@
 "use client";
 
+import { getUser } from "@/requests/user";
 import { UserType } from "@/types/UserType";
 import { Avatar } from "@nextui-org/react";
 import Image from "next/image";
@@ -12,11 +13,7 @@ export default function UserPage() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/user?slug=${slug}`
-          : `http://localhost:3005/api/v1/user?slug=${slug}`
-      );
+      const response = await getUser(`${slug}`);
       setUser(await response.json());
     };
 

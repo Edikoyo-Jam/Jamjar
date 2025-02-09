@@ -14,6 +14,8 @@ import { UserType } from "@/types/UserType";
 import { useRouter } from 'next/navigation';
 import { GameType } from "@/types/GameType";
 import { PlatformType, DownloadLinkType } from "@/types/DownloadLinkType";
+import { getSelf, searchUsers } from "@/requests/user";
+import { getCurrentGame, postGame, updateGame } from "@/requests/game";
 
 
 
@@ -61,15 +63,7 @@ export default function CreateGamePage() {
   const handleAuthorSearch = async (query: string) => {
     if (query.length < 3) return;
     
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_MODE === "PROD"
-        ? `https://d2jam.com/api/v1/user/search?q=${query}`
-        : `http://localhost:3005/api/v1/user/search?q=${query}`,
-      {
-        headers: { authorization: `Bearer ${getCookie("token")}` },
-        credentials: "include",
-      }
-    );
+    const response = await searchUsers(query);
     
     if (response.ok) {
       const data = await response.json();
@@ -90,24 +84,12 @@ export default function CreateGamePage() {
     setMounted(true);
     
     const load = async () => {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
-          : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
-        {
-          headers: { authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
-        }
-      );
+      const response = await getSelf();
       const localuser = await response.json();
       setUser(localuser);
   
       /*
-      const tagResponse = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/tags`
-          : `http://localhost:3005/api/v1/tags`
-      );
+      const tagResponse = await getTags();
 
       if (tagResponse.ok) {
         const newoptions: {
@@ -155,15 +137,7 @@ export default function CreateGamePage() {
   useEffect(() => {
     const checkExistingGame = async () => {
       
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self/current-game?username=${getCookie("user")}`
-          : `http://localhost:3005/api/v1/self/current-game?username=${getCookie("user")}`,
-        {
-          headers: { authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
-        }
-      );
+      const response = await getCurrentGame()
       console.log("say");
       if (response.ok) {
         const gameData = await response.json();
@@ -249,34 +223,18 @@ export default function CreateGamePage() {
         setWaitingPost(true);
 
         try {
-          const requestMethod = editGame ? "PUT" : "POST";
-          const endpoint = editGame ? `/games/${prevSlug}` : "/games/create";
+          const links = downloadLinks.map((link) => ({
+            url: link.url,
+            platform: link.platform,
+          }));
 
-          const response = await fetch(
-            process.env.NEXT_PUBLIC_MODE === "PROD"
-              ? `https://d2jam.com/api/v1${endpoint}`
-              : `http://localhost:3005/api/v1${endpoint}`,
-            {
-              body: JSON.stringify({
-                name: title,
-                slug: gameSlug,
-                description: sanitizedHtml,
-                thumbnail: thumbnailUrl,
-                downloadLinks: downloadLinks.map((link) => ({
-                  url: link.url,
-                  platform: link.platform,
-                })),
-                userSlug, 
-                contributors: selectedAuthors.map((author) => author.id),
-              }),
-              method: requestMethod,
-              headers: {
-                "Content-Type": "application/json",
-                authorization: `Bearer ${getCookie("token")}`,
-              },
-              credentials: "include",
-            }
-          );
+          const contributors = selectedAuthors.map((author) => author.id);
+
+          const request = editGame ? 
+            updateGame(prevSlug, title, gameSlug, sanitizedHtml, thumbnailUrl, links, userSlug, contributors) :
+            postGame(title, gameSlug, sanitizedHtml, thumbnailUrl, links, userSlug, contributors);
+
+          const response = await request;
 
           if (response.status === 401) {
             setErrors({ content: "Invalid user" });

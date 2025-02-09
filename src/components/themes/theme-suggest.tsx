@@ -9,6 +9,7 @@ import {
 } from "@/helpers/jam";
 import { ThemeType } from "@/types/ThemeType";
 import { joinJam } from "@/helpers/jam";
+import { deleteThemeSuggestion, getThemeSuggestions, postThemeSuggestion } from "@/requests/theme";
 
 export default function ThemeSuggestions() {
   const [suggestion, setSuggestion] = useState("");
@@ -44,15 +45,7 @@ export default function ThemeSuggestions() {
   // Fetch all suggestions for the logged-in user
   const fetchSuggestions = async () => {
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/themes/suggestion"
-          : "http://localhost:3005/api/v1/themes/suggestion",
-        {
-          headers: { Authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
-        }
-      );
+      const response = await getThemeSuggestions();
       if (response.ok) {
         const data = await response.json();
         setUserSuggestions(data);
@@ -89,20 +82,7 @@ export default function ThemeSuggestions() {
         throw new Error("User is not authenticated. Please log in.");
       }
 
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/themes/suggestion"
-          : "http://localhost:3005/api/v1/themes/suggestion",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: "include",
-          body: JSON.stringify({ suggestionText: suggestion }),
-        }
-      );
+      const response = await postThemeSuggestion(suggestion);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -128,18 +108,7 @@ export default function ThemeSuggestions() {
   // Handle deleting a suggestion
   const handleDelete = async (id: number) => {
     try {
-      const token = getCookie("token");
-
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/themes/suggestion/${id}`
-          : `http://localhost:3005/api/v1/themes/suggestion/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-          credentials: "include",
-        }
-      );
+      const response = await deleteThemeSuggestion(id);
 
       if (!response.ok) {
         throw new Error("Failed to delete suggestion.");

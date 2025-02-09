@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { getCookie, hasCookie } from "@/helpers/cookie";
 import sanitizeHtml from "sanitize-html";
 import LikeButton from "./LikeButton";
+import { postComment } from "@/requests/comment";
 
 export default function CommentCard({ comment }: { comment: CommentType }) {
   const [creatingReply, setCreatingReply] = useState<boolean>(false);
@@ -93,24 +94,7 @@ export default function CommentCard({ comment }: { comment: CommentType }) {
                   const sanitizedHtml = sanitizeHtml(content);
                   setWaitingPost(true);
 
-                  const response = await fetch(
-                    process.env.NEXT_PUBLIC_MODE === "PROD"
-                      ? "https://d2jam.com/api/v1/comment"
-                      : "http://localhost:3005/api/v1/comment",
-                    {
-                      body: JSON.stringify({
-                        content: sanitizedHtml,
-                        username: getCookie("user"),
-                        commentId: comment?.id,
-                      }),
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        authorization: `Bearer ${getCookie("token")}`,
-                      },
-                      credentials: "include",
-                    }
-                  );
+                  const response = await postComment(sanitizedHtml, comment!.id);
 
                   if (response.status == 401) {
                     toast.error("Invalid User");
