@@ -4,7 +4,7 @@ import Editor from "@/components/editor";
 import sanitizeHtml from "sanitize-html";
 import { getCookie, hasCookie } from "@/helpers/cookie";
 import { UserType } from "@/types/UserType";
-import { Avatar, Button, Form, Input } from "@nextui-org/react";
+import { Avatar, Button, Form, Input, Spacer } from "@nextui-org/react";
 import { redirect, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -13,9 +13,9 @@ import Image from "next/image";
 
 export default function UserPage() {
   const [user, setUser] = useState<UserType>();
-  const [profilePicture, setProfilePicture] = useState("");
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [name, setName] = useState("");
-  const [bannerPicture, setBannerPicture] = useState("");
+  const [bannerPicture, setBannerPicture] = useState<string | null>(null);
   const [bio, setBio] = useState("");
   const [errors] = useState({});
   const pathname = usePathname();
@@ -104,7 +104,7 @@ export default function UserPage() {
 
             if (response.ok) {
               toast.success("Changed settings");
-              setUser(await response.json());
+              setUser((await response.json()).data);
               setWaitingSave(false);
             } else {
               toast.error("Failed to update settings");
@@ -127,31 +127,104 @@ export default function UserPage() {
           <p>Bio</p>
           <Editor content={bio} setContent={setBio} />
 
-          <Input
-            label="Profile Picture"
-            labelPlacement="outside"
-            name="profilePicture"
-            placeholder="Enter a url to an image"
-            type="text"
-            value={profilePicture}
-            onValueChange={setProfilePicture}
+          <p>Profile Picture</p>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+
+              const formData = new FormData();
+              formData.append("upload", file);
+
+              try {
+                const response = await fetch(
+                  process.env.NEXT_PUBLIC_MODE === "PROD"
+                    ? "https://d2jam.com/api/v1/image"
+                    : "http://localhost:3005/api/v1/image",
+                  {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                      authorization: `Bearer ${getCookie("token")}`,
+                    },
+                    credentials: "include",
+                  }
+                );
+
+                if (response.ok) {
+                  const data = await response.json();
+                  setProfilePicture(data.data);
+                  toast.success(data.message);
+                } else {
+                  toast.error("Failed to upload image");
+                }
+              } catch (error) {
+                console.error(error);
+                toast.error("Error uploading image");
+              }
+            }}
           />
 
-          {profilePicture && <Avatar src={profilePicture} />}
+          {profilePicture && (
+            <div>
+              <Avatar src={profilePicture} />
+              <Spacer y={3} />
+              <Button
+                color="danger"
+                size="sm"
+                onPress={() => {
+                  setProfilePicture(null);
+                }}
+              >
+                Remove Profile Picture
+              </Button>
+            </div>
+          )}
 
-          <Input
-            label="Banner Picture"
-            labelPlacement="outside"
-            name="bannerPicture"
-            placeholder="Enter a url to an image"
-            type="text"
-            value={bannerPicture}
-            onValueChange={setBannerPicture}
+          <p>Banner Image</p>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+
+              const formData = new FormData();
+              formData.append("upload", file);
+
+              try {
+                const response = await fetch(
+                  process.env.NEXT_PUBLIC_MODE === "PROD"
+                    ? "https://d2jam.com/api/v1/image"
+                    : "http://localhost:3005/api/v1/image",
+                  {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                      authorization: `Bearer ${getCookie("token")}`,
+                    },
+                    credentials: "include",
+                  }
+                );
+
+                if (response.ok) {
+                  const data = await response.json();
+                  setBannerPicture(data.data);
+                  toast.success(data.message);
+                } else {
+                  toast.error("Failed to upload image");
+                }
+              } catch (error) {
+                console.error(error);
+                toast.error("Error uploading image");
+              }
+            }}
           />
 
-          {bannerPicture &&
-            bannerPicture.startsWith("https://") &&
-            bannerPicture.length > 8 && (
+          {bannerPicture && (
+            <div className="w-full">
               <div className="bg-[#222222] h-28 w-full relative">
                 <Image
                   src={bannerPicture}
@@ -160,7 +233,18 @@ export default function UserPage() {
                   fill
                 />
               </div>
-            )}
+              <Spacer y={3} />
+              <Button
+                color="danger"
+                size="sm"
+                onPress={() => {
+                  setBannerPicture(null);
+                }}
+              >
+                Remove Banner Picture
+              </Button>
+            </div>
+          )}
 
           <div className="flex gap-2">
             <Button color="primary" type="submit">
