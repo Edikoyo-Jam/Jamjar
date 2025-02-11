@@ -129,6 +129,7 @@ export default function Editor({
           const allowedTypes = [
             "image/jpeg", // JPEG images
             "image/png", // PNG images
+            "image/apng", // APNG images
             "image/gif", // GIF images
             "image/webp", // WebP images
             "image/svg+xml", // SVG images
