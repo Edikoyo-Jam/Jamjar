@@ -183,7 +183,7 @@ export default function UserPage() {
             </div>
           )}
 
-          <p>Banner Image</p>
+          <p>Banner Picture</p>
           <input
             type="file"
             accept="image/*"
