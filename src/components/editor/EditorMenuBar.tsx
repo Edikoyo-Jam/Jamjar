@@ -9,6 +9,7 @@ import {
   Bold,
   Code,
   Highlighter,
+  ImageIcon,
   Italic,
   LinkIcon,
   Minus,
@@ -21,6 +22,8 @@ import {
   Undo,
 } from "lucide-react";
 import EditorMenuButton from "./EditorMenuButton";
+import { toast } from "react-toastify";
+import { getCookie } from "@/helpers/cookie";
 
 type EditorMenuProps = {
   editor: Editor | null;
@@ -40,6 +43,73 @@ export default function EditorMenuBar({ editor }: EditorMenuProps) {
         .run();
     }
   };
+
+  const addImage = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.style.display = "none";
+
+    input.addEventListener("change", handleImageUpload);
+
+    document.body.appendChild(input);
+    input.click();
+
+    // Clean up after the dialog closes
+    input.addEventListener("blur", () => document.body.removeChild(input));
+  };
+
+  async function handleImageUpload(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+
+    const file = target.files[0];
+    const filesize = parseInt((file.size / 1024 / 1024).toFixed(4));
+
+    const allowedTypes = [
+      "image/jpeg", // JPEG images
+      "image/png", // PNG images
+      "image/gif", // GIF images
+      "image/webp", // WebP images
+      "image/svg+xml", // SVG images
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Invalid file format");
+      return false;
+    }
+
+    if (filesize > 8) {
+      toast.error("Image is too big");
+      return false;
+    }
+
+    const formData = new FormData();
+    formData.append("upload", file);
+
+    fetch(
+      process.env.NEXT_PUBLIC_MODE === "PROD"
+        ? "https://d2jam.com/api/v1/image"
+        : "http://localhost:3005/api/v1/image",
+      {
+        method: "POST",
+        body: formData,
+        headers: {
+          authorization: `Bearer ${getCookie("token")}`,
+        },
+        credentials: "include",
+      }
+    ).then((response) => {
+      if (response.ok) {
+        response.json().then((data) => {
+          toast.success(data.message);
+          editor?.commands.setImage({ src: data.data });
+        });
+      } else {
+        toast.error("Failed to upload image");
+      }
+    });
+  }
 
   const buttons = [
     {
@@ -89,6 +159,12 @@ export default function EditorMenuBar({ editor }: EditorMenuProps) {
       onClick: addLink,
       disabled: false,
       isActive: editor.isActive("link"),
+    },
+    {
+      icon: <ImageIcon size={20} />,
+      onClick: addImage,
+      disabled: false,
+      isActive: false,
     },
     {
       icon: <Minus size={20} />,

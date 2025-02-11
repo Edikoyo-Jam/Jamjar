@@ -180,7 +180,7 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="absolute flex items-top mt-40 justify-center top-0 left-0 w-screen h-screen">
+    <div className="static flex items-top mt-10 justify-center top-0 left-0 gap-16">
       <Form
         className="w-full max-w-2xl flex flex-col gap-4"
         validationErrors={errors}
@@ -282,6 +282,7 @@ export default function CreatePostPage() {
 
         <Spacer />
 
+        <p>Tags</p>
         {mounted && (
           <Select
             styles={styles}
