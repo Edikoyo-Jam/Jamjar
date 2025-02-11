@@ -21,6 +21,7 @@ export default function UserPage() {
   const [errors] = useState({});
   const pathname = usePathname();
   const [waitingSave, setWaitingSave] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -127,15 +128,20 @@ export default function UserPage() {
             onValueChange={setName}
           />
 
-          <Input
-            label="Email"
-            labelPlacement="outside"
-            name="email"
-            placeholder="Enter an email"
-            type="text"
-            value={email}
-            onValueChange={setEmail}
-          />
+          <p>Email</p>
+          {showEmail && (
+            <Input
+              label="Email"
+              name="email"
+              placeholder="Enter an email"
+              type="text"
+              value={email}
+              onValueChange={setEmail}
+            />
+          )}
+          <Button size="sm" onPress={() => setShowEmail(!showEmail)}>
+            {showEmail ? "Hide Email" : "Show Email"}
+          </Button>
 
           <p>Bio</p>
           <Editor content={bio} setContent={setBio} />
