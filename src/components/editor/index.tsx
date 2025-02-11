@@ -8,7 +8,6 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import EditorMenuBar from "./EditorMenuBar";
 import Bold from "@tiptap/extension-bold";
 import Italic from "@tiptap/extension-italic";
-import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import Strike from "@tiptap/extension-strike";
 import Subscript from "@tiptap/extension-subscript";
@@ -66,7 +65,6 @@ export default function Editor({
       }),
       Bold,
       Italic,
-      Underline,
       Highlight,
       Strike,
       Subscript,

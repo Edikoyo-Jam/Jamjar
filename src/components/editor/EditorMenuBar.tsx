@@ -18,7 +18,6 @@ import {
   Strikethrough,
   Subscript,
   Superscript,
-  Underline,
   Undo,
 } from "lucide-react";
 import EditorMenuButton from "./EditorMenuButton";
@@ -124,12 +123,6 @@ export default function EditorMenuBar({ editor }: EditorMenuProps) {
       onClick: () => editor.chain().focus().toggleItalic().run(),
       disabled: false,
       isActive: editor.isActive("italic"),
-    },
-    {
-      icon: <Underline size={20} />,
-      onClick: () => editor.chain().focus().toggleUnderline().run(),
-      disabled: false,
-      isActive: editor.isActive("underline"),
     },
     {
       icon: <Highlighter size={20} />,
