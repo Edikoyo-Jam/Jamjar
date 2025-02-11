@@ -45,7 +45,7 @@ export default function UserPage() {
           <div className="p-8 mt-8">
             <p className="text-3xl">{user.name}</p>
             <div
-              className="prose dark:prose-invert !duration-250 !ease-linear !transition-all"
+              className="prose dark:prose-invert !duration-250 !ease-linear !transition-all max-w-full break-words"
               dangerouslySetInnerHTML={{
                 __html:
                   user.bio && user.bio != "<p></p>" ? user.bio : "No user bio",
