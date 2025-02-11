@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { GameType } from "@/types/GameType";
 import { PlatformType, DownloadLinkType } from "@/types/DownloadLinkType";
 import { sanitize } from "@/helpers/sanitize";
+import Image from "next/image";
 
 export default function CreateGamePage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function CreateGamePage() {
   const [gameSlug, setGameSlug] = useState("");
   const [prevSlug, setPrevGameSlug] = useState("");
   const [game, setGame] = useState<GameType>();
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [authorSearch, setAuthorSearch] = useState("");
   const [selectedAuthors, setSelectedAuthors] = useState<Array<UserType>>([]);
   const [searchResults, setSearchResults] = useState<Array<UserType>>([]);
@@ -392,13 +393,68 @@ export default function CreateGamePage() {
         <Spacer />
 
         <div className="flex flex-col gap-4">
-          <Input
-            label="Thumbnail URL"
-            labelPlacement="outside"
-            placeholder="https://example.com/thumbnail.png"
-            value={thumbnailUrl}
-            onValueChange={setThumbnailUrl}
+          <p>Thumbnail</p>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+
+              const formData = new FormData();
+              formData.append("upload", file);
+
+              try {
+                const response = await fetch(
+                  process.env.NEXT_PUBLIC_MODE === "PROD"
+                    ? "https://d2jam.com/api/v1/image"
+                    : "http://localhost:3005/api/v1/image",
+                  {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                      authorization: `Bearer ${getCookie("token")}`,
+                    },
+                    credentials: "include",
+                  }
+                );
+
+                if (response.ok) {
+                  const data = await response.json();
+                  setThumbnailUrl(data.data);
+                  toast.success(data.message);
+                } else {
+                  toast.error("Failed to upload image");
+                }
+              } catch (error) {
+                console.error(error);
+                toast.error("Error uploading image");
+              }
+            }}
           />
+
+          {thumbnailUrl && (
+            <div className="w-full">
+              <div className="bg-[#222222] h-28 w-full relative">
+                <Image
+                  src={thumbnailUrl}
+                  alt={`${title}'s thumbnail`}
+                  className="object-cover"
+                  fill
+                />
+              </div>
+              <Spacer y={3} />
+              <Button
+                color="danger"
+                size="sm"
+                onPress={() => {
+                  setThumbnailUrl(null);
+                }}
+              >
+                Remove Banner Picture
+              </Button>
+            </div>
+          )}
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">

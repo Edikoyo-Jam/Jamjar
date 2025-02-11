@@ -124,12 +124,18 @@ export default function Editor({
           const file = event.dataTransfer.files[0];
           const filesize = parseInt((file.size / 1024 / 1024).toFixed(4));
 
-          if (file.type !== "image/jpeg" && file.type !== "image/png") {
+          const allowedTypes = [
+            "image/jpeg", // JPEG images
+            "image/png", // PNG images
+            "image/gif", // GIF images
+            "image/webp", // WebP images
+            "image/svg+xml", // SVG images
+          ];
+
+          if (!allowedTypes.includes(file.type)) {
             toast.error("Invalid file format");
             return false;
           }
-
-          console.log(filesize);
 
           if (filesize > 8) {
             toast.error("Image is too big");
