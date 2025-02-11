@@ -6,6 +6,7 @@ export function sanitize(content: string) {
     allowedAttributes: {
       img: ["src", "style"],
       p: ["style"],
+      a: ["target", "rel", "href"],
     },
     allowedStyles: {
       img: {
