@@ -37,8 +37,8 @@ import { redirect, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Editor from "@/components/editor";
-import sanitizeHtml from "sanitize-html";
 import CommentCard from "@/components/posts/CommentCard";
+import { sanitize } from "@/helpers/sanitize";
 
 export default function PostPage() {
   const [post, setPost] = useState<PostType>();
@@ -579,7 +579,7 @@ export default function PostPage() {
                 return;
               }
 
-              const sanitizedHtml = sanitizeHtml(content);
+              const sanitizedHtml = sanitize(content);
               setWaitingPost(true);
 
               const response = await fetch(

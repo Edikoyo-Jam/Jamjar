@@ -60,6 +60,7 @@
     "react-select": "^5.9.0",
     "react-toastify": "^11.0.3",
     "sanitize-html": "^2.14.0",
+    "tiptap-extension-resize-image": "^1.2.1",
     "tiptap-markdown": "^0.8.10"
   },
   "devDependencies": {

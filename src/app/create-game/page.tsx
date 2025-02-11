@@ -2,25 +2,21 @@
 
 import Editor from "@/components/editor";
 import { getCookie } from "@/helpers/cookie";
-import {  Button, Form, Input, Spacer } from "@nextui-org/react";
+import { Button, Form, Input, Spacer } from "@nextui-org/react";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import sanitizeHtml from "sanitize-html";
 import { Select, SelectItem } from "@nextui-org/react";
 import Timers from "@/components/timers";
 import Streams from "@/components/streams";
 import { UserType } from "@/types/UserType";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { GameType } from "@/types/GameType";
 import { PlatformType, DownloadLinkType } from "@/types/DownloadLinkType";
-
-
-
-
+import { sanitize } from "@/helpers/sanitize";
 
 export default function CreateGamePage() {
-  const router = useRouter(); 
+  const router = useRouter();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -53,14 +49,14 @@ export default function CreateGamePage() {
   const sanitizeSlug = (value: string): string => {
     return value
       .toLowerCase() // Convert to lowercase
-      .replace(/\s+/g, '-') // Replace whitespace with hyphens
-      .replace(/[^a-z0-9-]/g, '') // Only allow lowercase letters, numbers, and hyphens
+      .replace(/\s+/g, "-") // Replace whitespace with hyphens
+      .replace(/[^a-z0-9-]/g, "") // Only allow lowercase letters, numbers, and hyphens
       .substring(0, 50); // Limit length to 50 characters
   };
 
   const handleAuthorSearch = async (query: string) => {
     if (query.length < 3) return;
-    
+
     const response = await fetch(
       process.env.NEXT_PUBLIC_MODE === "PROD"
         ? `https://d2jam.com/api/v1/user/search?q=${query}`
@@ -70,7 +66,7 @@ export default function CreateGamePage() {
         credentials: "include",
       }
     );
-    
+
     if (response.ok) {
       const data = await response.json();
       setSearchResults(data);
@@ -88,7 +84,7 @@ export default function CreateGamePage() {
 
   useEffect(() => {
     setMounted(true);
-    
+
     const load = async () => {
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
@@ -101,7 +97,7 @@ export default function CreateGamePage() {
       );
       const localuser = await response.json();
       setUser(localuser);
-  
+
       /*
       const tagResponse = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
@@ -150,15 +146,18 @@ export default function CreateGamePage() {
         */
     };
     load();
-  },[]);
+  }, []);
 
   useEffect(() => {
     const checkExistingGame = async () => {
-      
       const response = await fetch(
         process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self/current-game?username=${getCookie("user")}`
-          : `http://localhost:3005/api/v1/self/current-game?username=${getCookie("user")}`,
+          ? `https://d2jam.com/api/v1/self/current-game?username=${getCookie(
+              "user"
+            )}`
+          : `http://localhost:3005/api/v1/self/current-game?username=${getCookie(
+              "user"
+            )}`,
         {
           headers: { authorization: `Bearer ${getCookie("token")}` },
           credentials: "include",
@@ -177,340 +176,350 @@ export default function CreateGamePage() {
           setThumbnailUrl(gameData.thumbnail);
           setDownloadLinks(gameData.downloadLinks);
           setGame(gameData);
-          const uniqueAuthors = [gameData.author, ...gameData.contributors]
-            .filter((author, index, self) => 
+          const uniqueAuthors = [
+            gameData.author,
+            ...gameData.contributors,
+          ].filter(
+            (author, index, self) =>
               index === self.findIndex((a) => a.id === author.id)
-            );
+          );
           setSelectedAuthors(uniqueAuthors);
-        
-        }
-        else
-        {
+        } else {
           setSelectedAuthors(user ? [user] : []);
         }
-      }
-      else
-      {
-       
+      } else {
         setEditGame(false);
         setTitle("");
         setGameSlug("");
         setContent("");
-        setEditorKey((prev) => prev + 1); 
+        setEditorKey((prev) => prev + 1);
         setThumbnailUrl("");
         setDownloadLinks([]);
-        
       }
     };
-  
-    if (mounted && user) { 
+
+    if (mounted && user) {
       checkExistingGame();
     }
-    
-  },[user,mounted]);
-  
+  }, [user, mounted]);
 
   return (
     <div className="static flex items-top mt-20 justify-center top-0 left-0">
-    
-    <Form
-      className="w-full max-w-2xl flex flex-col gap-4"
-      validationErrors={errors}
-      onSubmit={async (e) => {
-        e.preventDefault();
+      <Form
+        className="w-full max-w-2xl flex flex-col gap-4"
+        validationErrors={errors}
+        onSubmit={async (e) => {
+          e.preventDefault();
 
-        if (!title && !content) {
-          setErrors({
-            title: "Please enter a valid title",
-            content: "Please enter valid content",
-          });
-          toast.error("Please enter valid content");
-          return;
-        }
-
-        if (!title) {
-          setErrors({ title: "Please enter a valid title" });
-          return;
-        }
-
-        if (!content) {
-          setErrors({ content: "Please enter valid content" });
-          toast.error("Please enter valid content");
-          return;
-        }
-
-        const userSlug = getCookie("user"); // Retrieve user slug from cookies
-        if (!userSlug) {
-          toast.error("You are not logged in.");
-          return;
-        }
-
-        const sanitizedHtml = sanitizeHtml(content);
-        setWaitingPost(true);
-
-        try {
-          const requestMethod = editGame ? "PUT" : "POST";
-          const endpoint = editGame ? `/games/${prevSlug}` : "/games/create";
-
-          const response = await fetch(
-            process.env.NEXT_PUBLIC_MODE === "PROD"
-              ? `https://d2jam.com/api/v1${endpoint}`
-              : `http://localhost:3005/api/v1${endpoint}`,
-            {
-              body: JSON.stringify({
-                name: title,
-                slug: gameSlug,
-                description: sanitizedHtml,
-                thumbnail: thumbnailUrl,
-                downloadLinks: downloadLinks.map((link) => ({
-                  url: link.url,
-                  platform: link.platform,
-                })),
-                userSlug, 
-                contributors: selectedAuthors.map((author) => author.id),
-              }),
-              method: requestMethod,
-              headers: {
-                "Content-Type": "application/json",
-                authorization: `Bearer ${getCookie("token")}`,
-              },
-              credentials: "include",
-            }
-          );
-
-          if (response.status === 401) {
-            setErrors({ content: "Invalid user" });
-            setWaitingPost(false);
+          if (!title && !content) {
+            setErrors({
+              title: "Please enter a valid title",
+              content: "Please enter valid content",
+            });
+            toast.error("Please enter valid content");
             return;
           }
 
-          if (response.ok) {
-            toast.success(gameSlug ? "Game updated successfully!" : "Game created successfully!");
-            setWaitingPost(false);
-            router.push(`/games/${gameSlug || sanitizeSlug(title)}`);
-          } else {
-            const error = await response.text();
-            toast.error(error || "Failed to create game");
-            setWaitingPost(false);
+          if (!title) {
+            setErrors({ title: "Please enter a valid title" });
+            return;
           }
-        } catch (error) {
-          console.error("Error creating game:", error);
-          toast.error("Failed to create game.");
-        }
-      }}
-    >
-         <div>
-     <h1 className="text-2xl font-bold mb-4 flex">
-      {gameSlug ? "Edit Game" : "Create New Game"}
-    </h1>
-     </div>
-        <Input
-        isRequired
-        label="Game Name"
-        labelPlacement="outside"
-        name="title"
-        placeholder="Enter your game name"
-        type="text"
-        value={title}
-        onValueChange={(value) => {
-          setTitle(value);
-          if (!isSlugManuallyEdited) {
-            setGameSlug(sanitizeSlug(value));
+
+          if (!content) {
+            setErrors({ content: "Please enter valid content" });
+            toast.error("Please enter valid content");
+            return;
           }
-        }}
-      />
 
-      <Input
-        label="Game Slug"
-        labelPlacement="outside"
-        placeholder="your-game-name"
-        value={gameSlug}
-        onValueChange={(value) => {
-          setGameSlug(sanitizeSlug(value));
-          setIsSlugManuallyEdited(true);
-        }}
-        description="This will be used in the URL: d2jam.com/games/your-game-name"
-      />
+          const userSlug = getCookie("user"); // Retrieve user slug from cookies
+          if (!userSlug) {
+            toast.error("You are not logged in.");
+            return;
+          }
 
-<div className="flex flex-col gap-2">
-    <label className="text-sm font-medium">Add Authors</label>
-    <Input
-      placeholder="Search users..."
-      value={authorSearch}
-      onValueChange={(value) => {
-        setAuthorSearch(value);
-        handleAuthorSearch(value);
-      }}
-    />
-    {searchResults.length > 0 && (
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
-        {searchResults.map((user) => (
-          <div
-            key={user.id}
-            className="flex justify-between items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded cursor-pointer"
-            onClick={() => {
-              if (!selectedAuthors.some(a => a.id === user.id)) {
-                setSelectedAuthors([...selectedAuthors, user]);
+          const sanitizedHtml = sanitize(content);
+          setWaitingPost(true);
+
+          try {
+            const requestMethod = editGame ? "PUT" : "POST";
+            const endpoint = editGame ? `/games/${prevSlug}` : "/games/create";
+
+            const response = await fetch(
+              process.env.NEXT_PUBLIC_MODE === "PROD"
+                ? `https://d2jam.com/api/v1${endpoint}`
+                : `http://localhost:3005/api/v1${endpoint}`,
+              {
+                body: JSON.stringify({
+                  name: title,
+                  slug: gameSlug,
+                  description: sanitizedHtml,
+                  thumbnail: thumbnailUrl,
+                  downloadLinks: downloadLinks.map((link) => ({
+                    url: link.url,
+                    platform: link.platform,
+                  })),
+                  userSlug,
+                  contributors: selectedAuthors.map((author) => author.id),
+                }),
+                method: requestMethod,
+                headers: {
+                  "Content-Type": "application/json",
+                  authorization: `Bearer ${getCookie("token")}`,
+                },
+                credentials: "include",
               }
-              setSearchResults([]);
-              setAuthorSearch("");
+            );
+
+            if (response.status === 401) {
+              setErrors({ content: "Invalid user" });
+              setWaitingPost(false);
+              return;
+            }
+
+            if (response.ok) {
+              toast.success(
+                gameSlug
+                  ? "Game updated successfully!"
+                  : "Game created successfully!"
+              );
+              setWaitingPost(false);
+              router.push(`/games/${gameSlug || sanitizeSlug(title)}`);
+            } else {
+              const error = await response.text();
+              toast.error(error || "Failed to create game");
+              setWaitingPost(false);
+            }
+          } catch (error) {
+            console.error("Error creating game:", error);
+            toast.error("Failed to create game.");
+          }
+        }}
+      >
+        <div>
+          <h1 className="text-2xl font-bold mb-4 flex">
+            {gameSlug ? "Edit Game" : "Create New Game"}
+          </h1>
+        </div>
+        <Input
+          isRequired
+          label="Game Name"
+          labelPlacement="outside"
+          name="title"
+          placeholder="Enter your game name"
+          type="text"
+          value={title}
+          onValueChange={(value) => {
+            setTitle(value);
+            if (!isSlugManuallyEdited) {
+              setGameSlug(sanitizeSlug(value));
+            }
+          }}
+        />
+
+        <Input
+          label="Game Slug"
+          labelPlacement="outside"
+          placeholder="your-game-name"
+          value={gameSlug}
+          onValueChange={(value) => {
+            setGameSlug(sanitizeSlug(value));
+            setIsSlugManuallyEdited(true);
+          }}
+          description="This will be used in the URL: d2jam.com/games/your-game-name"
+        />
+
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">Add Authors</label>
+          <Input
+            placeholder="Search users..."
+            value={authorSearch}
+            onValueChange={(value) => {
+              setAuthorSearch(value);
+              handleAuthorSearch(value);
             }}
-          >
-            <span>{user.name}</span>
+          />
+          {searchResults.length > 0 && (
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
+              {searchResults.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex justify-between items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded cursor-pointer"
+                  onClick={() => {
+                    if (!selectedAuthors.some((a) => a.id === user.id)) {
+                      setSelectedAuthors([...selectedAuthors, user]);
+                    }
+                    setSearchResults([]);
+                    setAuthorSearch("");
+                  }}
+                >
+                  <span>{user.name}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="flex flex-wrap gap-2 mt-2">
+            {selectedAuthors.map((author) => (
+              <div
+                key={author.id}
+                className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 px-3 py-1 rounded-full flex items-center gap-2"
+              >
+                <span>{author.name}</span>
+                {((game && author.id !== game.authorId) ||
+                  (!game && author.id !== user?.id)) && (
+                  <button
+                    onClick={() =>
+                      setSelectedAuthors(
+                        selectedAuthors.filter((a) => a.id !== author.id)
+                      )
+                    }
+                    className="text-sm hover:text-red-500"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    )}
-    <div className="flex flex-wrap gap-2 mt-2">
-  {selectedAuthors.map((author) => (
-    <div
-      key={author.id}
-      className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 px-3 py-1 rounded-full flex items-center gap-2"
-    >
-      <span>{author.name}</span>
-      {((game && author.id !== game.authorId) || (!game && author.id !== user?.id)) && (
-        <button
-          onClick={() => setSelectedAuthors(selectedAuthors.filter(a => a.id !== author.id))}
-          className="text-sm hover:text-red-500"
-        >
-          ×
-        </button>
-      )}
-    </div>
-  ))}
-</div>
-  </div>
-  <label className="text-sm font-medium">Game Description</label>
-        <Editor key={editorKey} content={content} setContent={setContent} gameEditor />  
+        </div>
+        <label className="text-sm font-medium">Game Description</label>
+        <Editor
+          key={editorKey}
+          content={content}
+          setContent={setContent}
+          gameEditor
+        />
 
         <Spacer />
 
-        
-        
-  <div className="flex flex-col gap-4">
-  
+        <div className="flex flex-col gap-4">
+          <Input
+            label="Thumbnail URL"
+            labelPlacement="outside"
+            placeholder="https://example.com/thumbnail.png"
+            value={thumbnailUrl}
+            onValueChange={setThumbnailUrl}
+          />
 
-    <Input
-      label="Thumbnail URL"
-      labelPlacement="outside"
-      placeholder="https://example.com/thumbnail.png"
-      value={thumbnailUrl}
-      onValueChange={setThumbnailUrl}
-    />
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              {Array.isArray(downloadLinks) &&
+                downloadLinks.map((link, index) => (
+                  <div key={link.id} className="flex gap-2">
+                    <Input
+                      className="flex-grow"
+                      placeholder="https://example.com/download"
+                      value={link.url}
+                      onValueChange={(value) => {
+                        const newLinks = [...downloadLinks];
+                        newLinks[index].url = value;
+                        setDownloadLinks(newLinks);
+                      }}
+                      onBlur={() => {
+                        if (!urlRegex.test(downloadLinks[index].url)) {
+                          toast.error(
+                            "Please enter a valid URL starting with http:// or https://"
+                          );
 
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        {Array.isArray(downloadLinks) &&
-          downloadLinks.map((link, index) => (
-            <div key={link.id} className="flex gap-2">
-             <Input
-              className="flex-grow"
-              placeholder="https://example.com/download"
-              value={link.url}
-              onValueChange={(value) => {
-                const newLinks = [...downloadLinks];
-                newLinks[index].url = value;
-                setDownloadLinks(newLinks);
-              }}
-              onBlur={() => {
-                if (!urlRegex.test(downloadLinks[index].url)) {
-                  toast.error("Please enter a valid URL starting with http:// or https://");
-                
-                  if (!downloadLinks[index].url.startsWith("http://") && !downloadLinks[index].url.startsWith("https://")) {
-                    const newUrl = "https://" + downloadLinks[index].url;
-                    const newLinks = [...downloadLinks];
-                    newLinks[index].url = newUrl;
-                    setDownloadLinks(newLinks);
-                    const input = document.querySelector<HTMLInputElement>(
-                      `#download-link-${index}`
-                    );
-                    if (input) {
-                        input.value = newUrl;
-                    }
-                  }
-
-
-                }
-              }}
-            />
-              <Select
-                className="w-96"
-                defaultSelectedKeys={["Windows"]}
-                aria-label="Select platform" // Add this to fix accessibility warning
-                onSelectionChange={(value) => {
-                  const newLinks = [...downloadLinks];
-                  newLinks[index].platform = value as unknown as PlatformType;
-                  setDownloadLinks(newLinks);
-                }}
-              >
-                <SelectItem key="Windows" value="Windows">
-                  Windows
-                </SelectItem>
-                <SelectItem key="MacOS" value="MacOS">
-                  MacOS
-                </SelectItem>
-                <SelectItem key="Linux" value="Linux">
-                  Linux
-                </SelectItem>
-                <SelectItem key="Web" value="Web">
-                  Web
-                </SelectItem>
-                <SelectItem key="Mobile" value="Mobile">
-                  Mobile
-                </SelectItem>
-                <SelectItem key="Other" value="Other">
-                  Other
-                </SelectItem>
-              </Select>
-              <Button
-                color="danger"
-                variant="light"
-                onPress={() => {
-                  setDownloadLinks(downloadLinks.filter((l) => l.id !== link.id));
-                }}
-              >
-                ×
-              </Button>
+                          if (
+                            !downloadLinks[index].url.startsWith("http://") &&
+                            !downloadLinks[index].url.startsWith("https://")
+                          ) {
+                            const newUrl =
+                              "https://" + downloadLinks[index].url;
+                            const newLinks = [...downloadLinks];
+                            newLinks[index].url = newUrl;
+                            setDownloadLinks(newLinks);
+                            const input =
+                              document.querySelector<HTMLInputElement>(
+                                `#download-link-${index}`
+                              );
+                            if (input) {
+                              input.value = newUrl;
+                            }
+                          }
+                        }
+                      }}
+                    />
+                    <Select
+                      className="w-96"
+                      defaultSelectedKeys={["Windows"]}
+                      aria-label="Select platform" // Add this to fix accessibility warning
+                      onSelectionChange={(value) => {
+                        const newLinks = [...downloadLinks];
+                        newLinks[index].platform =
+                          value as unknown as PlatformType;
+                        setDownloadLinks(newLinks);
+                      }}
+                    >
+                      <SelectItem key="Windows" value="Windows">
+                        Windows
+                      </SelectItem>
+                      <SelectItem key="MacOS" value="MacOS">
+                        MacOS
+                      </SelectItem>
+                      <SelectItem key="Linux" value="Linux">
+                        Linux
+                      </SelectItem>
+                      <SelectItem key="Web" value="Web">
+                        Web
+                      </SelectItem>
+                      <SelectItem key="Mobile" value="Mobile">
+                        Mobile
+                      </SelectItem>
+                      <SelectItem key="Other" value="Other">
+                        Other
+                      </SelectItem>
+                    </Select>
+                    <Button
+                      color="danger"
+                      variant="light"
+                      onPress={() => {
+                        setDownloadLinks(
+                          downloadLinks.filter((l) => l.id !== link.id)
+                        );
+                      }}
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
             </div>
-          ))}
-      </div>
 
-      <Button
-        color="primary"
-        variant="solid"
-        onPress={() => {
-          setDownloadLinks([
-            ...downloadLinks,
-            {
-              id: Date.now(),
-              url: "",
-              platform: "Windows",
-            },
-          ]);
-        }}
-      >
-        Add Download Link
-      </Button>
-    </div>
+            <Button
+              color="primary"
+              variant="solid"
+              onPress={() => {
+                setDownloadLinks([
+                  ...downloadLinks,
+                  {
+                    id: Date.now(),
+                    url: "",
+                    platform: "Windows",
+                  },
+                ]);
+              }}
+            >
+              Add Download Link
+            </Button>
+          </div>
 
-      <div className="flex gap-2">
-          <Button color="primary" type="submit">
-          {waitingPost ? (
-            <LoaderCircle className="animate-spin" size={16} />
-          ) : (
-            <p>{editGame ? "Update" : "Create"}</p>
-          )}
-        </Button>
-      </div>
-    </div>
+          <div className="flex gap-2">
+            <Button color="primary" type="submit">
+              {waitingPost ? (
+                <LoaderCircle className="animate-spin" size={16} />
+              ) : (
+                <p>{editGame ? "Update" : "Create"}</p>
+              )}
+            </Button>
+          </div>
+        </div>
       </Form>
       {!isMobile && (
         <div className="flex flex-col gap-4 px-8 items-end">
-        <Timers />
-        <Streams />
-      </div>
+          <Timers />
+          <Streams />
+        </div>
       )}
-      
-    </div>    
+    </div>
   );
 }

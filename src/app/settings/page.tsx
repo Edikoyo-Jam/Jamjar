@@ -1,7 +1,6 @@
 "use client";
 
 import Editor from "@/components/editor";
-import sanitizeHtml from "sanitize-html";
 import { getCookie, hasCookie } from "@/helpers/cookie";
 import { UserType } from "@/types/UserType";
 import { Avatar, Button, Form, Input, Spacer } from "@nextui-org/react";
@@ -10,6 +9,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
+import { sanitize } from "@/helpers/sanitize";
 
 export default function UserPage() {
   const [user, setUser] = useState<UserType>();
@@ -71,7 +71,7 @@ export default function UserPage() {
           onSubmit={async (e) => {
             e.preventDefault();
 
-            const sanitizedBio = sanitizeHtml(bio);
+            const sanitizedBio = sanitize(bio);
 
             if (!name) {
               toast.error("You need to enter a name");

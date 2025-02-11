@@ -14,12 +14,12 @@ import { LoaderCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import sanitizeHtml from "sanitize-html";
 import Select, { MultiValue, StylesConfig } from "react-select";
 import { useTheme } from "next-themes";
 import Timers from "@/components/timers";
 import Streams from "@/components/streams";
 import { UserType } from "@/types/UserType";
+import { sanitize } from "@/helpers/sanitize";
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState("");
@@ -118,7 +118,6 @@ export default function CreatePostPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-
   const styles: StylesConfig<
     {
       value: string;
@@ -213,7 +212,7 @@ export default function CreatePostPage() {
             return;
           }
 
-          const sanitizedHtml = sanitizeHtml(content);
+          const sanitizedHtml = sanitize(content);
           setWaitingPost(true);
 
           const tags = [];
@@ -320,10 +319,10 @@ export default function CreatePostPage() {
       </Form>
       {!isMobile && (
         <div className="flex flex-col gap-4 px-8 items-end">
-        <Timers />
-        <Streams />
-      </div>
+          <Timers />
+          <Streams />
+        </div>
       )}
-    </div>    
+    </div>
   );
 }

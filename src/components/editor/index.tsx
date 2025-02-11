@@ -37,6 +37,9 @@ import CodeBlock from "@tiptap/extension-code-block";
 import { Spacer } from "@nextui-org/react";
 import { useTheme } from "next-themes";
 import Link from "@tiptap/extension-link";
+import ImageResize from "tiptap-extension-resize-image";
+import { toast } from "react-toastify";
+import { getCookie } from "@/helpers/cookie";
 
 type EditorProps = {
   content: string;
@@ -95,6 +98,7 @@ export default function Editor({
       Youtube,
       CodeBlock,
       Link,
+      ImageResize,
     ],
     content: content,
     immediatelyRender: false,
@@ -109,6 +113,69 @@ export default function Editor({
             ? "min-h-[600px] max-h-[600px]"
             : "min-h-[150px] max-h-[400px]") +
           " overflow-y-auto cursor-text rounded-md border p-5 focus-within:outline-none focus-within:border-blue-500 !duration-250 !ease-linear !transition-all",
+      },
+      handleDrop: (view, event, slice, moved) => {
+        if (
+          !moved &&
+          event.dataTransfer &&
+          event.dataTransfer.files &&
+          event.dataTransfer.files[0]
+        ) {
+          const file = event.dataTransfer.files[0];
+          const filesize = parseInt((file.size / 1024 / 1024).toFixed(4));
+
+          if (file.type !== "image/jpeg" && file.type !== "image/png") {
+            toast.error("Invalid file format");
+            return false;
+          }
+
+          console.log(filesize);
+
+          if (filesize > 8) {
+            toast.error("Image is too big");
+            return false;
+          }
+
+          const formData = new FormData();
+          formData.append("upload", event.dataTransfer.files[0]);
+
+          fetch(
+            process.env.NEXT_PUBLIC_MODE === "PROD"
+              ? "https://d2jam.com/api/v1/image"
+              : "http://localhost:3005/api/v1/image",
+            {
+              method: "POST",
+              body: formData,
+              headers: {
+                authorization: `Bearer ${getCookie("token")}`,
+              },
+              credentials: "include",
+            }
+          ).then((response) => {
+            if (response.ok) {
+              response.json().then((data) => {
+                toast.success(data.message);
+                const { schema } = view.state;
+                const coordinates = view.posAtCoords({
+                  left: event.clientX,
+                  top: event.clientY,
+                });
+                if (!coordinates) {
+                  toast.error("Error getting coordinates");
+                  return;
+                }
+
+                const node = schema.nodes.image.create({ src: data.data });
+                const transaction = view.state.tr.insert(coordinates.pos, node);
+                return view.dispatch(transaction);
+              });
+            } else {
+              toast.error("Failed to upload image");
+            }
+          });
+        }
+
+        return false;
       },
     },
   });
