@@ -15,6 +15,7 @@ export default function UserPage() {
   const [user, setUser] = useState<UserType>();
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [bannerPicture, setBannerPicture] = useState<string | null>(null);
   const [bio, setBio] = useState("");
   const [errors] = useState({});
@@ -48,6 +49,7 @@ export default function UserPage() {
         setBannerPicture(data.bannerPicture ?? "");
         setBio(data.bio ?? "");
         setName(data.name ?? "");
+        setEmail(data.email ?? "");
       } else {
         setUser(undefined);
       }
@@ -92,6 +94,7 @@ export default function UserPage() {
                   profilePicture: profilePicture,
                   bannerPicture: bannerPicture,
                   targetUserSlug: user.slug,
+                  email: email,
                 }),
                 method: "PUT",
                 headers: {
@@ -122,6 +125,16 @@ export default function UserPage() {
             type="text"
             value={name}
             onValueChange={setName}
+          />
+
+          <Input
+            label="Email"
+            labelPlacement="outside"
+            name="email"
+            placeholder="Enter an email"
+            type="text"
+            value={email}
+            onValueChange={setEmail}
           />
 
           <p>Bio</p>

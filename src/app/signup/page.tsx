@@ -10,6 +10,7 @@ export default function UserPage() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [errors, setErrors] = useState({});
+  const [email, setEmail] = useState("");
 
   return (
     <div className="absolute flex items-center justify-center top-0 left-0 w-screen h-screen">
@@ -66,12 +67,24 @@ export default function UserPage() {
             return;
           }
 
+          if (email) {
+            const regex = /.+@.+\..+/;
+            if (!email.match(regex)) {
+              setErrors({ email: "Invalid email" });
+              return;
+            }
+          }
+
           const response = await fetch(
             process.env.NEXT_PUBLIC_MODE === "PROD"
               ? "https://d2jam.com/api/v1/user"
               : "http://localhost:3005/api/v1/user",
             {
-              body: JSON.stringify({ username: username, password: password }),
+              body: JSON.stringify({
+                username: username,
+                password: password,
+                email: email,
+              }),
               method: "POST",
               headers: { "Content-Type": "application/json" },
               credentials: "include",
@@ -102,6 +115,16 @@ export default function UserPage() {
           type="text"
           value={username}
           onValueChange={setUsername}
+        />
+
+        <Input
+          label="Email"
+          labelPlacement="outside"
+          name="email"
+          placeholder="Optional"
+          type="text"
+          value={email}
+          onValueChange={setEmail}
         />
 
         <Input
