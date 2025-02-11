@@ -153,7 +153,7 @@ export default function PostCard({
               <Spacer y={4} />
 
               <div
-                className="prose dark:prose-invert !duration-250 !ease-linear !transition-all"
+                className="prose dark:prose-invert !duration-250 !ease-linear !transition-all max-w-full break-words"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
 
