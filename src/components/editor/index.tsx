@@ -121,6 +121,8 @@ export default function Editor({
           event.dataTransfer.files &&
           event.dataTransfer.files[0]
         ) {
+          event.preventDefault();
+
           const file = event.dataTransfer.files[0];
           const filesize = parseInt((file.size / 1024 / 1024).toFixed(4));
 
