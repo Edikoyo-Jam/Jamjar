@@ -10,6 +10,7 @@ import {
   Code,
   Highlighter,
   Italic,
+  LinkIcon,
   Minus,
   Quote,
   Redo,
@@ -27,6 +28,18 @@ type EditorMenuProps = {
 
 export default function EditorMenuBar({ editor }: EditorMenuProps) {
   if (!editor) return null;
+
+  const addLink = () => {
+    const url = prompt("Enter link URL:");
+    if (url) {
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: url })
+        .run();
+    }
+  };
 
   const buttons = [
     {
@@ -70,6 +83,12 @@ export default function EditorMenuBar({ editor }: EditorMenuProps) {
       onClick: () => editor.chain().focus().toggleSuperscript().run(),
       disabled: false,
       isActive: editor.isActive("superscript"),
+    },
+    {
+      icon: <LinkIcon size={20} />,
+      onClick: addLink,
+      disabled: false,
+      isActive: editor.isActive("link"),
     },
     {
       icon: <Minus size={20} />,
