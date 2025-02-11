@@ -36,6 +36,7 @@ import Youtube from "@tiptap/extension-youtube";
 import CodeBlock from "@tiptap/extension-code-block";
 import { Spacer } from "@nextui-org/react";
 import { useTheme } from "next-themes";
+import Link from "@tiptap/extension-link";
 
 type EditorProps = {
   content: string;
@@ -45,7 +46,11 @@ type EditorProps = {
 
 const limit = 32767;
 
-export default function Editor({ content, setContent,gameEditor }: EditorProps) {
+export default function Editor({
+  content,
+  setContent,
+  gameEditor,
+}: EditorProps) {
   const { theme } = useTheme();
 
   const editor = useEditor({
@@ -89,6 +94,7 @@ export default function Editor({ content, setContent,gameEditor }: EditorProps) 
       TableCell,
       Youtube,
       CodeBlock,
+      Link,
     ],
     content: content,
     immediatelyRender: false,
