@@ -23,8 +23,8 @@ export async function updateUser(
   userSlug: string,
   name: string,
   bio: string,
-  profilePicture: string,
-  bannerPicture: string
+  profilePicture: string | null,
+  bannerPicture: string | null
 ) {
   return fetch(`${BASE_URL}/user`, {
     body: JSON.stringify({
