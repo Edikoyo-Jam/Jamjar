@@ -27,8 +27,8 @@ export default function UserPage() {
   return (
     <div>
       {user && (
-        <div className="border-2 border-[#222224] relative rounded-xl overflow-hidden bg-[#18181a]">
-          <div className="bg-[#222222] h-28 relative">
+        <div className="border-2 border-[#dddddd] dark:border-[#222224] relative rounded-xl overflow-hidden bg-white dark:bg-[#18181a]">
+          <div className="bg-[#e4e4e4] dark:bg-[#222222] h-28 relative">
             {user.bannerPicture && (
               <Image
                 src={user.bannerPicture}
@@ -43,7 +43,9 @@ export default function UserPage() {
             src={user.profilePicture}
           />
           <div className="p-8 mt-8">
-            <p className="text-3xl">{user.name}</p>
+            <p className="text-3xl text-black dark:text-white !duration-500 !ease-linear !transition-all">
+              {user.name}
+            </p>
             <div
               className="prose dark:prose-invert !duration-250 !ease-linear !transition-all max-w-full break-words"
               dangerouslySetInnerHTML={{
