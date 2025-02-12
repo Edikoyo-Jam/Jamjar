@@ -53,6 +53,9 @@ import { PostTime } from "@/types/PostTimes";
 import { TagType } from "@/types/TagType";
 import { useTheme } from "next-themes";
 import StickyPostCard from "./StickyPostCard";
+import { getTags } from "@/requests/tag";
+import { getSelf } from "@/requests/user";
+import { getPosts } from "@/requests/post";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
@@ -159,11 +162,7 @@ export default function Posts() {
     const loadUserAndPosts = async () => {
       setLoading(true);
 
-      const tagResponse = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/tags`
-          : `http://localhost:3005/api/v1/tags`
-      );
+      const tagResponse = await getTags();
 
       if (tagResponse.ok) {
         const tagObject: {
@@ -191,113 +190,19 @@ export default function Posts() {
       }
 
       // Fetch the user
-      const userResponse = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
-          : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
-        {
-          headers: { authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
-        }
-      );
+      const userResponse = await getSelf();
+      const userData = userResponse.ok ? await userResponse.json() : undefined;
+      setUser(userData);
 
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        setUser(userData);
+      // Fetch posts (with userSlug if user is available)
+      const postsResponse = await getPosts(sort, time, false, tagRules, userData?.slug);
+      setPosts(await postsResponse.json());
 
-        // Fetch posts with userSlug if user is available
-        const postsResponse = await fetch(
-          process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? `https://d2jam.com/api/v1/posts?sort=${sort}&user=${
-                userData.slug
-              }&time=${time}&tags=${
-                tagRules
-                  ? Object.entries(tagRules)
-                      .map((key) => `${key}`)
-                      .join("_")
-                  : ""
-              }`
-            : `http://localhost:3005/api/v1/posts?sort=${sort}&user=${
-                userData.slug
-              }&time=${time}&tags=${
-                tagRules
-                  ? Object.entries(tagRules)
-                      .map((key) => `${key}`)
-                      .join("_")
-                  : ""
-              }`
-        );
-        setPosts(await postsResponse.json());
-
-        // Sticky posts
-        // Fetch posts with userSlug if user is available
-        const stickyPostsResponse = await fetch(
-          process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? `https://d2jam.com/api/v1/posts?sort=${sort}&user=${
-                userData.slug
-              }&time=${time}&tags=${
-                tagRules
-                  ? Object.entries(tagRules)
-                      .map((key) => `${key}`)
-                      .join("_")
-                  : ""
-              }&sticky=true`
-            : `http://localhost:3005/api/v1/posts?sort=${sort}&user=${
-                userData.slug
-              }&time=${time}&tags=${
-                tagRules
-                  ? Object.entries(tagRules)
-                      .map((key) => `${key}`)
-                      .join("_")
-                  : ""
-              }&sticky=true`
-        );
-        setStickyPosts(await stickyPostsResponse.json());
-        setLoading(false);
-      } else {
-        setUser(undefined);
-
-        // Fetch posts without userSlug if user is not available
-        const postsResponse = await fetch(
-          process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? `https://d2jam.com/api/v1/posts?sort=${sort}&time=${time}&tags=${
-                tagRules
-                  ? Object.entries(tagRules)
-                      .map((key) => `${key}`)
-                      .join("_")
-                  : ""
-              }`
-            : `http://localhost:3005/api/v1/posts?sort=${sort}&time=${time}&tags=${
-                tagRules
-                  ? Object.entries(tagRules)
-                      .map((key) => `${key}`)
-                      .join("_")
-                  : ""
-              }`
-        );
-        setPosts(await postsResponse.json());
-
-        // Fetch posts without userSlug if user is not available
-        const stickyPostsResponse = await fetch(
-          process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? `https://d2jam.com/api/v1/posts?sort=${sort}&time=${time}&tags=${
-                tagRules
-                  ? Object.entries(tagRules)
-                      .map((key) => `${key}`)
-                      .join("_")
-                  : ""
-              }&sticky=true`
-            : `http://localhost:3005/api/v1/posts?sort=${sort}&time=${time}&tags=${
-                tagRules
-                  ? Object.entries(tagRules)
-                      .map((key) => `${key}`)
-                      .join("_")
-                  : ""
-              }&sticky=true`
-        );
-        setStickyPosts(await stickyPostsResponse.json());
-        setLoading(false);
-      }
+      // Sticky posts
+      // Fetch posts (with userSlug if user is available)
+      const stickyPostsResponse = await getPosts(sort, time, true, tagRules, userData?.slug);
+      setStickyPosts(await stickyPostsResponse.json());
+      setLoading(false);
     };
 
     loadUserAndPosts();

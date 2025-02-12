@@ -19,6 +19,9 @@ import { useTheme } from "next-themes";
 import Timers from "@/components/timers";
 import Streams from "@/components/streams";
 import { UserType } from "@/types/UserType";
+import { getSelf } from "@/requests/user";
+import { getTags } from "@/requests/tag";
+import { postPost } from "@/requests/post";
 import { sanitize } from "@/helpers/sanitize";
 
 export default function CreatePostPage() {
@@ -49,24 +52,12 @@ export default function CreatePostPage() {
     setMounted(true);
 
     const load = async () => {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
-          : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
-        {
-          headers: { authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
-        }
-      );
+      const response = await getSelf();
 
       const localuser = await response.json();
       setUser(localuser);
 
-      const tagResponse = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/tags`
-          : `http://localhost:3005/api/v1/tags`
-      );
+      const tagResponse = await getTags();
 
       if (tagResponse.ok) {
         const newoptions: {
@@ -225,31 +216,13 @@ export default function CreatePostPage() {
             }
           }
 
-          const response = await fetch(
-            process.env.NEXT_PUBLIC_MODE === "PROD"
-              ? "https://d2jam.com/api/v1/post"
-              : "http://localhost:3005/api/v1/post",
-            {
-              body: JSON.stringify({
-                title: title,
-                content: sanitizedHtml,
-                sticky,
-                username: getCookie("user"),
-                tags: [
-                  ...tags,
-                  ...(options
-                    ? options.filter((tag) => tag.isFixed).map((tag) => tag.id)
-                    : []),
-                ],
-              }),
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                authorization: `Bearer ${getCookie("token")}`,
-              },
-              credentials: "include",
-            }
-          );
+          const combinedTags = [
+            ...tags,
+            ...(options
+              ? options.filter((tag) => tag.isFixed).map((tag) => tag.id)
+              : []),
+          ];
+          const response = await postPost(title, sanitizedHtml, sticky, combinedTags);
 
           if (response.status == 401) {
             setErrors({ content: "Invalid user" });

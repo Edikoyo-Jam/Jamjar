@@ -9,6 +9,7 @@ import {
   joinJam
 } from "@/helpers/jam";
 import {ThemeType} from "@/types/ThemeType";
+import { getRandomThemes, getSlaughterThemes, postThemeSlaughterVote } from "@/requests/theme";
 
 export default function ThemeSlaughter() {
   const [randomTheme, setRandomTheme] = useState<ThemeType | null>(null);
@@ -61,15 +62,7 @@ export default function ThemeSlaughter() {
     }
 
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/themes/random"
-          : "http://localhost:3005/api/v1/themes/random",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          credentials: "include",
-        }
-      );
+      const response = await getRandomThemes();
       if (response.ok) {
         const data = await response.json();
         setRandomTheme(data);
@@ -86,15 +79,7 @@ export default function ThemeSlaughter() {
     if (!token) return; // Wait until token is available
 
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/themes/voteSlaughter"
-          : "http://localhost:3005/api/v1/themes/voteSlaughter",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          credentials: "include",
-        }
-      );
+      const response = await getSlaughterThemes();
       if (response.ok) {
         const data = await response.json();
         setVotedThemes(data);
@@ -114,23 +99,7 @@ export default function ThemeSlaughter() {
     setThemeLoading((prev) => ({ ...prev, [randomTheme.id]: true }));
   
     try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/themes/voteSlaughter"
-          : "http://localhost:3005/api/v1/themes/voteSlaughter",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            suggestionId: randomTheme.id,
-            voteType,
-          }),
-        }
-      );
+      const response = await postThemeSlaughterVote(randomTheme.id, voteType);
   
       if (response.ok) {
         // Refresh data after voting

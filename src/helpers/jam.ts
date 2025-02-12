@@ -1,6 +1,7 @@
 import { JamType } from "@/types/JamType";
 import { getCookie } from "./cookie";
 import { toast } from "react-toastify";
+import * as jamRequests from '@/requests/jam'
 
 export interface ActiveJamResponse {
   phase: string;
@@ -8,23 +9,13 @@ export interface ActiveJamResponse {
 }
 
 export async function getJams(): Promise<JamType[]> {
-  const response = await fetch(
-    process.env.NEXT_PUBLIC_MODE === "PROD"
-      ? "https://d2jam.com/api/v1/jams"
-      : "http://localhost:3005/api/v1/jams"
-  );
-
+  const response = await jamRequests.getJams();
   return response.json();
 }
 
 export async function getCurrentJam(): Promise<ActiveJamResponse | null> {
   try {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_MODE === "PROD"
-        ? "https://d2jam.com/api/v1/jams/active"
-        : "http://localhost:3005/api/v1/jams/active"
-    );
-
+    const response = await jamRequests.getCurrentJam();
     const data = await response.json();
     
     return {
@@ -38,23 +29,7 @@ export async function getCurrentJam(): Promise<ActiveJamResponse | null> {
 }
 
 export async function joinJam(jamId: number) {
-  const response = await fetch(
-    process.env.NEXT_PUBLIC_MODE === "PROD"
-      ? "https://d2jam.com/api/v1/join-jam"
-      : "http://localhost:3005/api/v1/join-jam",
-    {
-      body: JSON.stringify({
-        jamId: jamId,
-        userSlug: getCookie("user"),
-      }),
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${getCookie("token")}`,
-      },
-    }
-  );
+  const response = await jamRequests.joinJam(jamId);
 
   if (response.status == 401) {
     toast.error("You have already joined the jam");
@@ -70,17 +45,7 @@ export async function joinJam(jamId: number) {
 
 export async function hasJoinedCurrentJam(): Promise<boolean> {
   try {
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_MODE === "PROD"
-        ? "https://d2jam.com/api/v1/jams/participation"
-        : "http://localhost:3005/api/v1/jams/participation",
-      {
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${getCookie("token")}`,
-        },
-      }
-    );
+    const response = await jamRequests.hasJoinedCurrentJam();
 
     return response.ok;
   } catch (error) {

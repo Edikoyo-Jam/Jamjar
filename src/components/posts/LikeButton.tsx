@@ -7,6 +7,8 @@ import { getCookie } from "@/helpers/cookie";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+import { postComment } from "@/requests/comment";
+import { postLike } from "@/requests/like";
 
 export default function LikeButton({
   likes,
@@ -56,24 +58,7 @@ export default function LikeButton({
           redirect("/login");
         }
 
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? "https://d2jam.com/api/v1/like"
-            : "http://localhost:3005/api/v1/like",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              authorization: `Bearer ${getCookie("token")}`,
-            },
-            credentials: "include",
-            body: JSON.stringify({
-              username: getCookie("user"),
-              postId: !isComment ? parentId : 0,
-              commentId: isComment ? parentId : 0,
-            }),
-          }
-        );
+        const response = await postLike(parentId, isComment);
 
         if (!updatedLiked) {
           setLikeEffect(true);

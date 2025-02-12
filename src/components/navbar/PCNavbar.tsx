@@ -33,6 +33,8 @@ import NavbarButtonAction from "./NavbarButtonAction";
 import { toast } from "react-toastify";
 import NavbarIconLink from "./NavbarIconLink";
 import ThemeToggle from "../theme-toggle";
+import { getSelf } from "@/requests/user";
+import { getCurrentGame } from "@/requests/game";
 import IconLink from "../link-components/IconLink";
 import { SiBluesky, SiDiscord } from "@icons-pack/react-simple-icons";
 
@@ -69,34 +71,14 @@ export default function PCNavbar() {
         setUser(undefined);
         return;
       }
-
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
-          : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
-        {
-          headers: { authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
-        }
-      );
+  
+      const response = await getSelf();
 
       const user = await response.json();
 
       // Check if user has a game in current jam
-      const gameResponse = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/self/current-game?username=${getCookie(
-              "user"
-            )}`
-          : `http://localhost:3005/api/v1/self/current-game?username=${getCookie(
-              "user"
-            )}`,
-        {
-          headers: { authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
-        }
-      );
-
+      const gameResponse = await getCurrentGame();
+  
       if (gameResponse.ok) {
         const gameData = await gameResponse.json();
         console.log("Game Data:", gameData); // Log game data

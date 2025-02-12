@@ -3,16 +3,12 @@
 import { redirect } from "next/navigation";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
+import { logout as logoutUser } from "@/requests/auth";
 
 export default function UserPage() {
   useEffect(() => {
     async function logout() {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? "https://d2jam.com/api/v1/session"
-          : "http://localhost:3005/api/v1/session",
-        { method: "DELETE", credentials: "include" }
-      );
+      const response = await logoutUser();
 
       if (response.ok) {
         document.cookie =

@@ -9,6 +9,8 @@ import { useRouter } from 'next/navigation';
 import { GameType } from '@/types/GameType';
 import { UserType } from '@/types/UserType';
 import { DownloadLinkType } from '@/types/DownloadLinkType';
+import { getGame } from '@/requests/game';
+import { getSelf } from '@/requests/user';
 
 export default function GamePage({ params }: { params: Promise<{ gameSlug: string }> }) {
   const resolvedParams = use(params);
@@ -20,15 +22,7 @@ export default function GamePage({ params }: { params: Promise<{ gameSlug: strin
   useEffect(() => {
     const fetchGameAndUser = async () => {
       // Fetch the game data
-      const gameResponse = await fetch(
-        process.env.NEXT_PUBLIC_MODE === "PROD"
-          ? `https://d2jam.com/api/v1/games/${gameSlug}`
-          : `http://localhost:3005/api/v1/games/${gameSlug}`,
-        {
-          headers: { authorization: `Bearer ${getCookie("token")}` },
-          credentials: "include",
-        }
-      );
+      const gameResponse = await getGame(gameSlug);
 
       if (gameResponse.ok) {
         const gameData = await gameResponse.json();
@@ -47,15 +41,7 @@ export default function GamePage({ params }: { params: Promise<{ gameSlug: strin
 
       // Fetch the logged-in user data
       if (getCookie("token")) {
-        const userResponse = await fetch(
-          process.env.NEXT_PUBLIC_MODE === "PROD"
-            ? `https://d2jam.com/api/v1/self?username=${getCookie("user")}`
-            : `http://localhost:3005/api/v1/self?username=${getCookie("user")}`,
-          {
-            headers: { authorization: `Bearer ${getCookie("token")}` },
-            credentials: "include",
-          }
-        );
+        const userResponse = await getSelf();
 
         if (userResponse.ok) {
           const userData = await userResponse.json();

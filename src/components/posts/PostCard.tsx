@@ -37,6 +37,8 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { getCookie } from "@/helpers/cookie";
 import { toast } from "react-toastify";
 import { TagType } from "@/types/TagType";
+import { deletePost, stickPost } from "@/requests/post";
+import { assignAdmin, assignMod } from "@/requests/mod";
 
 export default function PostCard({
   post,
@@ -246,23 +248,7 @@ export default function PostCard({
                           startContent={<Trash />}
                           description="Delete your post"
                           onPress={async () => {
-                            const response = await fetch(
-                              process.env.NEXT_PUBLIC_MODE === "PROD"
-                                ? "https://d2jam.com/api/v1/post"
-                                : "http://localhost:3005/api/v1/post",
-                              {
-                                body: JSON.stringify({
-                                  postId: post.id,
-                                  username: getCookie("user"),
-                                }),
-                                method: "DELETE",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  authorization: `Bearer ${getCookie("token")}`,
-                                },
-                                credentials: "include",
-                              }
-                            );
+                            const response = await deletePost(post.id);
 
                             if (response.ok) {
                               toast.success("Deleted post");
@@ -285,23 +271,7 @@ export default function PostCard({
                           startContent={<X />}
                           description="Remove this post"
                           onPress={async () => {
-                            const response = await fetch(
-                              process.env.NEXT_PUBLIC_MODE === "PROD"
-                                ? "https://d2jam.com/api/v1/post"
-                                : "http://localhost:3005/api/v1/post",
-                              {
-                                body: JSON.stringify({
-                                  postId: post.id,
-                                  username: getCookie("user"),
-                                }),
-                                method: "DELETE",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  authorization: `Bearer ${getCookie("token")}`,
-                                },
-                                credentials: "include",
-                              }
-                            );
+                            const response = await deletePost(post.id);
 
                             if (response.ok) {
                               toast.success("Removed post");
@@ -319,26 +289,7 @@ export default function PostCard({
                             startContent={<StarOff />}
                             description="Unsticky post"
                             onPress={async () => {
-                              const response = await fetch(
-                                process.env.NEXT_PUBLIC_MODE === "PROD"
-                                  ? "https://d2jam.com/api/v1/post/sticky"
-                                  : "http://localhost:3005/api/v1/post/sticky",
-                                {
-                                  body: JSON.stringify({
-                                    postId: post.id,
-                                    sticky: false,
-                                    username: getCookie("user"),
-                                  }),
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    authorization: `Bearer ${getCookie(
-                                      "token"
-                                    )}`,
-                                  },
-                                  credentials: "include",
-                                }
-                              );
+                              const response = await stickPost(post.id, false);
 
                               if (response.ok) {
                                 toast.success("Unsticked post");
@@ -356,26 +307,7 @@ export default function PostCard({
                             startContent={<Star />}
                             description="Sticky post"
                             onPress={async () => {
-                              const response = await fetch(
-                                process.env.NEXT_PUBLIC_MODE === "PROD"
-                                  ? "https://d2jam.com/api/v1/post/sticky"
-                                  : "http://localhost:3005/api/v1/post/sticky",
-                                {
-                                  body: JSON.stringify({
-                                    postId: post.id,
-                                    sticky: true,
-                                    username: getCookie("user"),
-                                  }),
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    authorization: `Bearer ${getCookie(
-                                      "token"
-                                    )}`,
-                                  },
-                                  credentials: "include",
-                                }
-                              );
+                              const response = await stickPost(post.id, true);
 
                               if (response.ok) {
                                 toast.success("Stickied post");
@@ -394,26 +326,7 @@ export default function PostCard({
                             startContent={<Shield />}
                             description="Promote user to Mod"
                             onPress={async () => {
-                              const response = await fetch(
-                                process.env.NEXT_PUBLIC_MODE === "PROD"
-                                  ? "https://d2jam.com/api/v1/mod"
-                                  : "http://localhost:3005/api/v1/mod",
-                                {
-                                  body: JSON.stringify({
-                                    targetname: post.author.slug,
-                                    mod: true,
-                                    username: getCookie("user"),
-                                  }),
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    authorization: `Bearer ${getCookie(
-                                      "token"
-                                    )}`,
-                                  },
-                                  credentials: "include",
-                                }
-                              );
+                              const response = await assignMod(post.author.slug, true);
 
                               if (response.ok) {
                                 toast.success("Promoted User to Mod");
@@ -438,25 +351,7 @@ export default function PostCard({
                             startContent={<ShieldX />}
                             description="Demote user from Mod"
                             onPress={async () => {
-                              const response = await fetch(
-                                process.env.NEXT_PUBLIC_MODE === "PROD"
-                                  ? "https://d2jam.com/api/v1/mod"
-                                  : "http://localhost:3005/api/v1/mod",
-                                {
-                                  body: JSON.stringify({
-                                    targetname: post.author.slug,
-                                    username: getCookie("user"),
-                                  }),
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    authorization: `Bearer ${getCookie(
-                                      "token"
-                                    )}`,
-                                  },
-                                  credentials: "include",
-                                }
-                              );
+                              const response = await assignMod(post.author.slug, false);
 
                               if (response.ok) {
                                 toast.success("Demoted User");
@@ -477,26 +372,7 @@ export default function PostCard({
                             startContent={<ShieldAlert />}
                             description="Promote user to Admin"
                             onPress={async () => {
-                              const response = await fetch(
-                                process.env.NEXT_PUBLIC_MODE === "PROD"
-                                  ? "https://d2jam.com/api/v1/mod"
-                                  : "http://localhost:3005/api/v1/mod",
-                                {
-                                  body: JSON.stringify({
-                                    targetname: post.author.slug,
-                                    admin: true,
-                                    username: getCookie("user"),
-                                  }),
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    authorization: `Bearer ${getCookie(
-                                      "token"
-                                    )}`,
-                                  },
-                                  credentials: "include",
-                                }
-                              );
+                              const response = await assignAdmin(post.author.slug, true);
 
                               if (response.ok) {
                                 toast.success("Promoted User to Admin");
@@ -521,26 +397,7 @@ export default function PostCard({
                             startContent={<ShieldX />}
                             description="Demote user to mod"
                             onPress={async () => {
-                              const response = await fetch(
-                                process.env.NEXT_PUBLIC_MODE === "PROD"
-                                  ? "https://d2jam.com/api/v1/mod"
-                                  : "http://localhost:3005/api/v1/mod",
-                                {
-                                  body: JSON.stringify({
-                                    targetname: post.author.slug,
-                                    mod: true,
-                                    username: getCookie("user"),
-                                  }),
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    authorization: `Bearer ${getCookie(
-                                      "token"
-                                    )}`,
-                                  },
-                                  credentials: "include",
-                                }
-                              );
+                              const response = await assignAdmin(post.author.slug, false);
 
                               if (response.ok) {
                                 toast.success("Demoted User to Mod");
