@@ -33,7 +33,7 @@ import {
 import LikeButton from "./LikeButton";
 import { PostStyle } from "@/types/PostStyle";
 import { UserType } from "@/types/UserType";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { getCookie } from "@/helpers/cookie";
 import { toast } from "react-toastify";
 import { TagType } from "@/types/TagType";
@@ -42,10 +42,16 @@ export default function PostCard({
   post,
   style,
   user,
+  index,
+  setCurrentPost,
+  onOpen,
 }: {
   post: PostType;
   style: PostStyle;
   user?: UserType;
+  index: number;
+  setCurrentPost: Dispatch<SetStateAction<number>>;
+  onOpen: () => void;
 }) {
   const [minimized, setMinimized] = useState<boolean>(false);
   const [hidden, setHidden] = useState<boolean>(false);
@@ -114,7 +120,16 @@ export default function PostCard({
           ) : (
             <div>
               <div className="flex justify-between items-center">
-                <Link href={`/p/${post.slug}`}>
+                <Link
+                  href={`/p/${post.slug}`}
+                  onClick={(e) => {
+                    if (window.innerWidth > 500) {
+                      e.preventDefault();
+                      setCurrentPost(index);
+                      onOpen();
+                    }
+                  }}
+                >
                   <p className="text-2xl">{post.title}</p>
                 </Link>
                 <Button
