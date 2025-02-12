@@ -1,7 +1,7 @@
 "use client";
 
 import Editor from "@/components/editor";
-import { getCookie, hasCookie } from "@/helpers/cookie";
+import { hasCookie } from "@/helpers/cookie";
 import {
   Avatar,
   Button,
@@ -222,7 +222,12 @@ export default function CreatePostPage() {
               ? options.filter((tag) => tag.isFixed).map((tag) => tag.id)
               : []),
           ];
-          const response = await postPost(title, sanitizedHtml, sticky, combinedTags);
+          const response = await postPost(
+            title,
+            sanitizedHtml,
+            sticky,
+            combinedTags
+          );
 
           if (response.status == 401) {
             setErrors({ content: "Invalid user" });

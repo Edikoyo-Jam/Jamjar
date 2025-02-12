@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Editor from "../editor";
 import { toast } from "react-toastify";
-import { getCookie, hasCookie } from "@/helpers/cookie";
+import { hasCookie } from "@/helpers/cookie";
 import LikeButton from "./LikeButton";
 import { postComment } from "@/requests/comment";
 import { sanitize } from "@/helpers/sanitize";
@@ -94,7 +94,10 @@ export default function CommentCard({ comment }: { comment: CommentType }) {
                   const sanitizedHtml = sanitize(content);
                   setWaitingPost(true);
 
-                  const response = await postComment(sanitizedHtml, comment!.id);
+                  const response = await postComment(
+                    sanitizedHtml,
+                    comment!.id
+                  );
 
                   if (response.status == 401) {
                     toast.error("Invalid User");

@@ -34,7 +34,6 @@ import LikeButton from "./LikeButton";
 import { PostStyle } from "@/types/PostStyle";
 import { UserType } from "@/types/UserType";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { getCookie } from "@/helpers/cookie";
 import { toast } from "react-toastify";
 import { TagType } from "@/types/TagType";
 import { deletePost, stickPost } from "@/requests/post";
@@ -326,7 +325,10 @@ export default function PostCard({
                             startContent={<Shield />}
                             description="Promote user to Mod"
                             onPress={async () => {
-                              const response = await assignMod(post.author.slug, true);
+                              const response = await assignMod(
+                                post.author.slug,
+                                true
+                              );
 
                               if (response.ok) {
                                 toast.success("Promoted User to Mod");
@@ -351,7 +353,10 @@ export default function PostCard({
                             startContent={<ShieldX />}
                             description="Demote user from Mod"
                             onPress={async () => {
-                              const response = await assignMod(post.author.slug, false);
+                              const response = await assignMod(
+                                post.author.slug,
+                                false
+                              );
 
                               if (response.ok) {
                                 toast.success("Demoted User");
@@ -372,7 +377,10 @@ export default function PostCard({
                             startContent={<ShieldAlert />}
                             description="Promote user to Admin"
                             onPress={async () => {
-                              const response = await assignAdmin(post.author.slug, true);
+                              const response = await assignAdmin(
+                                post.author.slug,
+                                true
+                              );
 
                               if (response.ok) {
                                 toast.success("Promoted User to Admin");
@@ -397,7 +405,10 @@ export default function PostCard({
                             startContent={<ShieldX />}
                             description="Demote user to mod"
                             onPress={async () => {
-                              const response = await assignAdmin(post.author.slug, false);
+                              const response = await assignAdmin(
+                                post.author.slug,
+                                false
+                              );
 
                               if (response.ok) {
                                 toast.success("Demoted User to Mod");

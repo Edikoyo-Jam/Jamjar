@@ -26,7 +26,6 @@ import {
 } from "@nextui-org/react";
 import { PostSort } from "@/types/PostSort";
 import { PostStyle } from "@/types/PostStyle";
-import { getCookie } from "@/helpers/cookie";
 import { UserType } from "@/types/UserType";
 import {
   Calendar,
@@ -195,12 +194,24 @@ export default function Posts() {
       setUser(userData);
 
       // Fetch posts (with userSlug if user is available)
-      const postsResponse = await getPosts(sort, time, false, tagRules, userData?.slug);
+      const postsResponse = await getPosts(
+        sort,
+        time,
+        false,
+        tagRules,
+        userData?.slug
+      );
       setPosts(await postsResponse.json());
 
       // Sticky posts
       // Fetch posts (with userSlug if user is available)
-      const stickyPostsResponse = await getPosts(sort, time, true, tagRules, userData?.slug);
+      const stickyPostsResponse = await getPosts(
+        sort,
+        time,
+        true,
+        tagRules,
+        userData?.slug
+      );
       setStickyPosts(await stickyPostsResponse.json());
       setLoading(false);
     };

@@ -1,7 +1,6 @@
 import { JamType } from "@/types/JamType";
-import { getCookie } from "./cookie";
 import { toast } from "react-toastify";
-import * as jamRequests from '@/requests/jam'
+import * as jamRequests from "@/requests/jam";
 
 export interface ActiveJamResponse {
   phase: string;
@@ -17,7 +16,7 @@ export async function getCurrentJam(): Promise<ActiveJamResponse | null> {
   try {
     const response = await jamRequests.getCurrentJam();
     const data = await response.json();
-    
+
     return {
       phase: data.phase,
       jam: data.futureJam,

@@ -7,7 +7,6 @@ import { getCookie } from "@/helpers/cookie";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { postComment } from "@/requests/comment";
 import { postLike } from "@/requests/like";
 
 export default function LikeButton({

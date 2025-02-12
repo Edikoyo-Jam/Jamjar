@@ -1,7 +1,7 @@
 "use client";
 
 import LikeButton from "@/components/posts/LikeButton";
-import { getCookie, hasCookie } from "@/helpers/cookie";
+import { hasCookie } from "@/helpers/cookie";
 import { PostType } from "@/types/PostType";
 import { TagType } from "@/types/TagType";
 import { UserType } from "@/types/UserType";
@@ -256,7 +256,10 @@ export default function PostPage() {
                                   startContent={<StarOff />}
                                   description="Unsticky post"
                                   onPress={async () => {
-                                    const response = await stickPost(post.id, false);
+                                    const response = await stickPost(
+                                      post.id,
+                                      false
+                                    );
 
                                     if (response.ok) {
                                       toast.success("Unsticked post");
@@ -274,7 +277,10 @@ export default function PostPage() {
                                   startContent={<Star />}
                                   description="Sticky post"
                                   onPress={async () => {
-                                    const response = await stickPost(post.id, true);
+                                    const response = await stickPost(
+                                      post.id,
+                                      true
+                                    );
 
                                     if (response.ok) {
                                       toast.success("Unsticked post");
@@ -293,7 +299,10 @@ export default function PostPage() {
                                   startContent={<Shield />}
                                   description="Promote user to Mod"
                                   onPress={async () => {
-                                    const response = await assignMod(post.author.slug, true);
+                                    const response = await assignMod(
+                                      post.author.slug,
+                                      true
+                                    );
 
                                     if (response.ok) {
                                       toast.success("Promoted User to Mod");
@@ -318,7 +327,10 @@ export default function PostPage() {
                                   startContent={<ShieldX />}
                                   description="Demote user from Mod"
                                   onPress={async () => {
-                                    const response = await assignMod(post.author.slug, false);
+                                    const response = await assignMod(
+                                      post.author.slug,
+                                      false
+                                    );
 
                                     if (response.ok) {
                                       toast.success("Demoted User");
@@ -339,7 +351,10 @@ export default function PostPage() {
                                   startContent={<ShieldAlert />}
                                   description="Promote user to Admin"
                                   onPress={async () => {
-                                    const response = await assignAdmin(post.author.slug, true);
+                                    const response = await assignAdmin(
+                                      post.author.slug,
+                                      true
+                                    );
 
                                     if (response.ok) {
                                       toast.success("Promoted User to Admin");
@@ -364,7 +379,10 @@ export default function PostPage() {
                                   startContent={<ShieldX />}
                                   description="Demote user to mod"
                                   onPress={async () => {
-                                    const response = await assignAdmin(post.author.slug, false);
+                                    const response = await assignAdmin(
+                                      post.author.slug,
+                                      false
+                                    );
 
                                     if (response.ok) {
                                       toast.success("Demoted User to Mod");

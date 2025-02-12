@@ -12,14 +12,13 @@ import { LogInIcon, NotebookPen } from "lucide-react";
 import NextImage from "next/image";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { getCookie, hasCookie } from "@/helpers/cookie";
+import { hasCookie } from "@/helpers/cookie";
 import { getCurrentJam } from "@/helpers/jam";
 import { JamType } from "@/types/JamType";
 import { UserType } from "@/types/UserType";
 import MobileNavbarUser from "./MobileNavbarUser";
 import ThemeToggle from "../theme-toggle";
 import { getSelf } from "@/requests/user";
-
 
 export default function MobileNavbar() {
   const pathname = usePathname();
@@ -29,36 +28,36 @@ export default function MobileNavbar() {
   const [user, setUser] = useState<UserType>();
 
   useEffect(() => {
-      loadUser();
-      async function loadUser() {
-        const jamResponse = await getCurrentJam();
-        const currentJam = jamResponse?.jam;
-        setJam(currentJam);
-    
-        if (!hasCookie("token")) {
-          setUser(undefined);
-          return;
-        }
-    
-        const response = await getSelf();
-        const user = await response.json();
-    
-        if (
-          currentJam &&
-          user.jams.filter((jam: JamType) => jam.id == currentJam.id).length > 0
-        ) {
-          setIsInJam(true);
-        } else {
-          setIsInJam(false);
-        }
-    
-        if (response.status == 200) {
-          setUser(user);
-        } else {
-          setUser(undefined);
-        }
+    loadUser();
+    async function loadUser() {
+      const jamResponse = await getCurrentJam();
+      const currentJam = jamResponse?.jam;
+      setJam(currentJam);
+
+      if (!hasCookie("token")) {
+        setUser(undefined);
+        return;
       }
-    }, [pathname]);
+
+      const response = await getSelf();
+      const user = await response.json();
+
+      if (
+        currentJam &&
+        user.jams.filter((jam: JamType) => jam.id == currentJam.id).length > 0
+      ) {
+        setIsInJam(true);
+      } else {
+        setIsInJam(false);
+      }
+
+      if (response.status == 200) {
+        setUser(user);
+      } else {
+        setUser(undefined);
+      }
+    }
+  }, [pathname]);
 
   return (
     <NavbarBase maxWidth="2xl" className="bg-[#222] p-1" isBordered height={80}>
@@ -79,9 +78,9 @@ export default function MobileNavbar() {
           </Link>
         </NavbarBrand>
       </NavbarContent>
-      
+
       <NavbarContent justify="end" className="gap-4">
-      <ThemeToggle />
+        <ThemeToggle />
         {!user && (
           <NavbarButtonLink icon={<LogInIcon />} name="Log In" href="/login" />
         )}

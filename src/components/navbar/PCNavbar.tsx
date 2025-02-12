@@ -23,7 +23,7 @@ import {
 import NextImage from "next/image";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { getCookie, hasCookie } from "@/helpers/cookie";
+import { hasCookie } from "@/helpers/cookie";
 import { getCurrentJam, joinJam } from "@/helpers/jam";
 import { JamType } from "@/types/JamType";
 import { GameType } from "@/types/GameType";
@@ -71,14 +71,14 @@ export default function PCNavbar() {
         setUser(undefined);
         return;
       }
-  
+
       const response = await getSelf();
 
       const user = await response.json();
 
       // Check if user has a game in current jam
       const gameResponse = await getCurrentGame();
-  
+
       if (gameResponse.ok) {
         const gameData = await gameResponse.json();
         console.log("Game Data:", gameData); // Log game data
