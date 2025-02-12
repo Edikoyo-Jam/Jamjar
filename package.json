@@ -26,6 +26,7 @@
     "@tiptap/extension-horizontal-rule": "^2.11.2",
     "@tiptap/extension-image": "^2.11.2",
     "@tiptap/extension-italic": "^2.11.2",
+    "@tiptap/extension-link": "^2.11.5",
     "@tiptap/extension-list-item": "^2.11.2",
     "@tiptap/extension-ordered-list": "^2.11.2",
     "@tiptap/extension-paragraph": "^2.11.2",
@@ -41,7 +42,6 @@
     "@tiptap/extension-text": "^2.11.2",
     "@tiptap/extension-text-align": "^2.11.2",
     "@tiptap/extension-typography": "^2.11.2",
-    "@tiptap/extension-underline": "^2.11.2",
     "@tiptap/extension-youtube": "^2.11.2",
     "@tiptap/pm": "^2.11.2",
     "@tiptap/react": "^2.11.2",
@@ -59,6 +59,7 @@
     "react-select": "^5.9.0",
     "react-toastify": "^11.0.3",
     "sanitize-html": "^2.14.0",
+    "tiptap-extension-resize-image": "^1.2.1",
     "tiptap-markdown": "^0.8.10"
   },
   "devDependencies": {

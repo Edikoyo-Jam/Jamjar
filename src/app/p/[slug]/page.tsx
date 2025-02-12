@@ -37,12 +37,12 @@ import { redirect, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Editor from "@/components/editor";
-import sanitizeHtml from "sanitize-html";
 import CommentCard from "@/components/posts/CommentCard";
 import { getSelf } from "@/requests/user";
 import { deletePost, getPost, stickPost } from "@/requests/post";
 import { assignAdmin, assignMod } from "@/requests/mod";
 import { postComment } from "@/requests/comment";
+import { sanitize } from "@/helpers/sanitize";
 
 export default function PostPage() {
   const [post, setPost] = useState<PostType>();
@@ -131,7 +131,7 @@ export default function PostPage() {
                     <Spacer y={4} />
 
                     <div
-                      className="prose dark:prose-invert !duration-250 !ease-linear !transition-all"
+                      className="prose dark:prose-invert !duration-250 !ease-linear !transition-all max-w-full break-words"
                       dangerouslySetInnerHTML={{ __html: post.content }}
                     />
 
@@ -410,7 +410,7 @@ export default function PostPage() {
                 return;
               }
 
-              const sanitizedHtml = sanitizeHtml(content);
+              const sanitizedHtml = sanitize(content);
               setWaitingPost(true);
 
               const response = await postComment(sanitizedHtml, post!.id);

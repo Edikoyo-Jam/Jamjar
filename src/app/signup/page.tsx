@@ -11,6 +11,7 @@ export default function UserPage() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [errors, setErrors] = useState({});
+  const [email, setEmail] = useState("");
 
   return (
     <div className="absolute flex items-center justify-center top-0 left-0 w-screen h-screen">
@@ -93,6 +94,16 @@ export default function UserPage() {
           type="text"
           value={username}
           onValueChange={setUsername}
+        />
+
+        <Input
+          label="Email"
+          labelPlacement="outside"
+          name="email"
+          placeholder="Optional"
+          type="text"
+          value={email}
+          onValueChange={setEmail}
         />
 
         <Input

@@ -7,9 +7,9 @@ import { useState } from "react";
 import Editor from "../editor";
 import { toast } from "react-toastify";
 import { getCookie, hasCookie } from "@/helpers/cookie";
-import sanitizeHtml from "sanitize-html";
 import LikeButton from "./LikeButton";
 import { postComment } from "@/requests/comment";
+import { sanitize } from "@/helpers/sanitize";
 
 export default function CommentCard({ comment }: { comment: CommentType }) {
   const [creatingReply, setCreatingReply] = useState<boolean>(false);
@@ -46,7 +46,7 @@ export default function CommentCard({ comment }: { comment: CommentType }) {
           <Spacer y={4} />
 
           <div
-            className="prose dark:prose-invert !duration-250 !ease-linear !transition-all"
+            className="prose dark:prose-invert !duration-250 !ease-linear !transition-all max-w-full break-words"
             dangerouslySetInnerHTML={{ __html: comment.content }}
           />
 
@@ -91,7 +91,7 @@ export default function CommentCard({ comment }: { comment: CommentType }) {
                     return;
                   }
 
-                  const sanitizedHtml = sanitizeHtml(content);
+                  const sanitizedHtml = sanitize(content);
                   setWaitingPost(true);
 
                   const response = await postComment(sanitizedHtml, comment!.id);
