@@ -2,13 +2,16 @@ import Posts from "@/components/posts";
 import Timers from "@/components/timers";
 import Streams from "@/components/streams";
 import JamHeader from "@/components/jam-header";
+import { Suspense } from "react";
 
 export default async function Home() {
   return (
     <div className="flex justify-between flex-wrap">
       <div className="md:w-2/3">
         <JamHeader />
-        <Posts />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Posts />
+        </Suspense>
       </div>
       <div>
         <Timers />
