@@ -14,7 +14,7 @@ export default function UserPage() {
   useEffect(() => {
     const fetchUser = async () => {
       const response = await getUser(`${slug}`);
-      setUser(await response.json());
+      setUser((await response.json()).data);
     };
 
     fetchUser();
