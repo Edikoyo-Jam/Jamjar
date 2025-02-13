@@ -229,6 +229,7 @@ export default function Streams() {
                       "unity",
                       "blender",
                       "aseprite",
+                      "gamedevelopment",
                     ].includes(tag.toLowerCase())
                   )
                   .map((tag) => (
