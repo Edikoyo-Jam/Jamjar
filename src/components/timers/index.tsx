@@ -1,5 +1,4 @@
 "use client";
-import { Spacer } from "@nextui-org/react";
 import React, { useState, useEffect } from "react";
 import Timer from "./Timer";
 import { getCurrentJam, ActiveJamResponse } from "@/helpers/jam";
@@ -41,8 +40,6 @@ export default function Timers() {
             name="Jam starts in"
             targetDate={new Date(activeJamResponse.jam.startTime)}
           />
-          <Spacer y={8} />
-          <p>Site under construction</p>
         </div>
       );
     } else if (activeJamResponse.phase == "Jamming") {
@@ -57,8 +54,6 @@ export default function Timers() {
               )
             }
           />
-          <Spacer y={8} />
-          <p>Site under construction</p>
         </div>
       );
     } else if (activeJamResponse.phase == "Rating") {
@@ -74,16 +69,12 @@ export default function Timers() {
               )
             }
           />
-          <Spacer y={8} />
-          <p>Site under construction</p>
         </div>
       );
     } else {
       return (
         <div className="text-[#333] dark:text-white transition-color duration-250">
           No upcoming jams
-          <Spacer y={8} />
-          <p>Site under construction</p>
         </div>
       );
     }

@@ -82,7 +82,16 @@ export default function PostCard({
           (minimized ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <Link href={`/p/${post.slug}`}>
+                <Link
+                  href={`/p/${post.slug}`}
+                  onClick={(e) => {
+                    if (window.innerWidth > 500) {
+                      e.preventDefault();
+                      setCurrentPost(index);
+                      onOpen();
+                    }
+                  }}
+                >
                   <p>{post.title}</p>
                 </Link>
 
@@ -434,7 +443,16 @@ export default function PostCard({
           ))}
         {style == "compact" && (
           <div>
-            <Link href={`/p/${post.slug}`}>
+            <Link
+              href={`/p/${post.slug}`}
+              onClick={(e) => {
+                if (window.innerWidth > 500) {
+                  e.preventDefault();
+                  setCurrentPost(index);
+                  onOpen();
+                }
+              }}
+            >
               <p className="text-2xl">{post.title}</p>
             </Link>
 
@@ -464,7 +482,16 @@ export default function PostCard({
         )}
         {style == "ultra" && (
           <div className="flex items-center gap-4">
-            <Link href={`/p/${post.slug}`}>
+            <Link
+              href={`/p/${post.slug}`}
+              onClick={(e) => {
+                if (window.innerWidth > 500) {
+                  e.preventDefault();
+                  setCurrentPost(index);
+                  onOpen();
+                }
+              }}
+            >
               <p>{post.title}</p>
             </Link>
 

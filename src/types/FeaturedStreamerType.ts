@@ -4,4 +4,5 @@ export interface FeaturedStreamerType {
   thumbnailUrl: string;
   streamTitle: string;
   streamTags: string[];
+  viewerCount: number;
 }
