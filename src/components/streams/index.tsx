@@ -13,7 +13,6 @@ import {
   Eye,
   Play,
 } from "lucide-react";
-import { redirect } from "next/navigation";
 
 export default function Streams() {
   const [streamers, setStreamers] = useState<FeaturedStreamerType[]>([]);
