@@ -35,9 +35,7 @@ export default function ButtonLink({ icon, href, name }: ButtonLinkProps) {
     >
       <Button
         endContent={icon}
-        className={`text-[#333] dark:text-white border-[#333]/50 dark:border-white/50 transition-all transform !duration-500 ease-in-out ${
-          !reduceMotion ? "hover:scale-110" : ""
-        }`}
+        className={`text-[#333] dark:text-white border-[#333]/50 dark:border-white/50 transition-all transform !duration-500 ease-in-out`}
         variant="bordered"
       >
         {name}
