@@ -9,7 +9,7 @@ export async function getSelf() {
 }
 
 export async function getUser(userSlug: string) {
-  return fetch(`${BASE_URL}/user?slug=${userSlug}`);
+  return fetch(`${BASE_URL}/user?targetUserSlug=${userSlug}`);
 }
 
 export async function searchUsers(query: string) {
